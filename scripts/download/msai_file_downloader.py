@@ -207,18 +207,14 @@ class MiaoshouFileDownloader(object):
                 time.sleep(1)
 
             if success:
-                print("*" * 80)
                 self.logger.info(f"{self.target_url} [DOWNLOADED COMPLETELY]")
-                print("*" * 80)
                 if self.local_directory:
                     target_local_file = os.path.join(self.local_directory, self.local_file)
                 else:
                     target_local_file = self.local_file
                 toolkit.move_file(specific_local_file, target_local_file)
             else:
-                print("*" * 80)
                 self.logger.info(f"{self.target_url} [  FAILED  ]")
-                print("*" * 80)
 
         except Exception as ex:
             self.logger.info(f"Unexpected Error: {ex}")  # Only from block above
