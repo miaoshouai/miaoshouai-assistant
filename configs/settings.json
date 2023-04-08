@@ -1,0 +1,16 @@
+{
+    "boot_settings": {
+        "drp_args_vram": "Med: 6-8G VRAM",
+        "drp_args_theme": "Light Mode",
+        "txt_args_listen_port": "7860",
+        "Enable xFormers": "--xformers",
+        "No Half": "False",
+        "No Half VAE": "False",
+        "Enable API": "--api",
+        "Auto Launch": "--autolaunch",
+        "Allow Local Network Access": "False",
+        "drp_choose_version": "Python Integrated",
+        "txt_args_more": "--ckpt-dir=C:\\\\Users\\\\Bob\\\\Projects\\\\stable-diffusion-webui\\\\models\\\\Stable-diffusion --lora-dir=C:\\\\Users\\\\Bob\\\\Projects\\\\stable-diffusion-webui\\\\models\\\\Lora",
+        "disable_log_console_output": true
+    }
+}

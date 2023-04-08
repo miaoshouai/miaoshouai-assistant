@@ -1,0 +1,158 @@
+import os
+import platform
+import sys
+import typing as t
+
+import psutil
+import torch
+
+import launch
+from scripts.logging.msai_logger import Logger
+from scripts.msai_utils import msai_toolkit as toolkit
+from scripts.msai_utils.msai_singleton import MiaoshouSingleton
+
+
+class MiaoshouPrelude(metaclass=MiaoshouSingleton):
+    _dataset = None
+
+    def __init__(self) -> None:
+        # Potential race condition, not call in multithread environment
+        if MiaoshouPrelude._dataset is None:
+            self._init_constants()
+
+            MiaoshouPrelude._dataset = {
+                "log_folder": os.path.join(self.ext_folder, "logs")
+            }
+
+            disable_log_console_output: bool = False
+            if self.all_settings.get("boot_settings"):
+                if self.all_settings["boot_settings"].get("disable_log_console_output") is not None:
+                    disable_log_console_output = self.all_settings["boot_settings"].get("disable_log_console_output")
+
+            self._logger = Logger(self._dataset["log_folder"], disable_console_output=disable_log_console_output)
+
+    def _init_constants(self) -> None:
+        self._api_url = {
+            "civitai": "https://civitai.com/api/v1/models",
+            "liandange": "https://model-api.paomiantv.cn/model/api/models",
+        }
+        self._ext_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+        self._setting_file = os.path.join(self.ext_folder, "configs", "settings.json")
+        self._model_hash_file = os.path.join(self.ext_folder, "configs", "model_hash.json")
+        self._model_json = {
+            'civitai': os.path.join(self.ext_folder, 'configs', 'civitai_models.json'),
+            'liandange': os.path.join(self.ext_folder, 'configs', 'liandange_models.json'),
+        }
+        self._checkboxes = {
+            'Enable xFormers': '--xformers',
+            'No Half': '--no-half',
+            'No Half VAE': '--no-half-vae',
+            'Enable API': '--api',
+            'Auto Launch': '--autolaunch',
+            'Allow Local Network Access': '--listen',
+        }
+
+        self._gpu_setting = {
+            'CPU Only': '--precision full --no-half --use-cpu SD GFPGAN BSRGAN ESRGAN SCUNet CodeFormer --all',
+            'GTX 16xx': '--lowvram --xformers --precision full --no-half',
+            'Low: 4-6G VRAM': '--xformers --lowvram',
+            'Med: 6-8G VRAM': '--xformers --medvram',
+            'Normal: 8+G VRAM': '',
+        }
+
+        self._theme_setting = {
+            'Auto': '',
+            'Light Mode': '--theme=light',
+            'Dark Mode': '--theme=dark',
+        }
+
+    @property
+    def ext_folder(self) -> str:
+        return self._ext_folder
+
+    @property
+    def log_folder(self) -> str:
+        return self._dataset.get("log_folder")
+
+    @property
+    def all_settings(self) -> t.Any:
+        return toolkit.read_json(self._setting_file)
+
+    @property
+    def boot_settings(self) -> t.Any:
+        all_setting = self.all_settings
+        if all_setting:
+            return all_setting['boot_settings']
+        else:
+            return None
+
+    def api_url(self, model_source: str) -> t.Optional[str]:
+        return self._api_url.get(model_source)
+
+    @property
+    def setting_file(self) -> str:
+        return self._setting_file
+
+    @property
+    def model_hash_file(self) -> str:
+        return self._model_hash_file
+
+    @property
+    def checkboxes(self) -> t.Dict[str, str]:
+        return self._checkboxes
+
+    @property
+    def gpu_setting(self) -> t.Dict[str, str]:
+        return self._gpu_setting
+
+    @property
+    def theme_setting(self) -> t.Dict[str, str]:
+        return self._theme_setting
+
+    @property
+    def model_json(self) -> t.Dict[str, t.Any]:
+        return self._model_json
+
+    def update_model_json(self, site: str, models: t.Dict[str, t.Any]) -> None:
+        if self._model_json.get(site) is None:
+            self._logger.error(f"cannot save model info for {site}")
+            return
+
+        self._logger.info(f"{self._model_json[site]} updated")
+        toolkit.write_json(self._model_json[site], models)
+
+    def load(self) -> None:
+        self._logger.info("start to do prelude")
+        self._logger.info(f"cmdline args: {' '.join(sys.argv[1:])}")
+
+    @classmethod
+    def get_sys_info(cls) -> str:
+        sys_info = 'System Information\n\n'
+
+        sys_info += r'OS Name: {0} {1}'.format(platform.system(), platform.release()) + '\n'
+        sys_info += r'OS Version: {0}'.format(platform.version()) + '\n'
+        sys_info += r'WebUI Version: {0}'.format(
+            f'https://github.com/AUTOMATIC1111/stable-diffusion-webui/commit/{launch.commit_hash()}') + '\n'
+        sys_info += r'Torch Version: {0}'.format(getattr(torch, '__long_version__', torch.__version__)) + '\n'
+        sys_info += r'Python Version: {0}'.format(sys.version) + '\n\n'
+        sys_info += r'CPU: {0}'.format(platform.processor()) + '\n'
+        sys_info += r'CPU Cores: {0}/{1}'.format(psutil.cpu_count(logical=False), psutil.cpu_count(logical=True)) + '\n'
+
+        # FIXME: should uncomment line below and remove my own workaround for MacOS
+        # sys_info += r'CPU Frequency: {0} GHz'.format(round(psutil.cpu_freq().max/1000,2)) + '\n'
+        # workaround: let my macbook M1 happy
+        sys_info += r'CPU Frequency: {0} GHz'.format(round(2540.547 / 1000, 2)) + '\n'
+
+        sys_info += r'CPU Usage: {0}%'.format(psutil.cpu_percent()) + '\n\n'
+        sys_info += r'RAM: {0}'.format(toolkit.get_readable_size(psutil.virtual_memory().total)) + '\n'
+        sys_info += r'Memory Usage: {0}%'.format(psutil.virtual_memory().percent) + '\n\n'
+        for i in range(torch.cuda.device_count()):
+            sys_info += r'Graphics Card{0}: {1} ({2})'.format(i, torch.cuda.get_device_properties(i).name,
+                                                              toolkit.get_readable_size(
+                                                                  torch.cuda.get_device_properties(
+                                                                      i).total_memory)) + '\n'
+            sys_info += r'Available VRAM: {0}'.format(toolkit.get_readable_size(torch.cuda.mem_get_info(i)[0])) + '\n'
+
+        return sys_info
+
+
