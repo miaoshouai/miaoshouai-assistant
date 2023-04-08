@@ -1,0 +1,17 @@
+# for vim
+.~
+.*.swp
+*~
+
+# for MacOS
+.DS_Store
+
+__pycache__/
+
+.idea/
+
+logs/
+flagged/
+
+configs/civitai_models.json
+configs/liandange_models.json
