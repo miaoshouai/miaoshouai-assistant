@@ -138,10 +138,10 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         sys_info += r'CPU: {0}'.format(platform.processor()) + '\n'
         sys_info += r'CPU Cores: {0}/{1}'.format(psutil.cpu_count(logical=False), psutil.cpu_count(logical=True)) + '\n'
 
-        # FIXME: should uncomment line below and remove my own workaround for MacOS
-        # sys_info += r'CPU Frequency: {0} GHz'.format(round(psutil.cpu_freq().max/1000,2)) + '\n'
-        # workaround: let my macbook M1 happy
-        sys_info += r'CPU Frequency: {0} GHz'.format(round(2540.547 / 1000, 2)) + '\n'
+        try:
+            sys_info += r'CPU Frequency: {0} GHz'.format(round(psutil.cpu_freq().max/1000,2)) + '\n'
+        except Exception as e:
+            sys_info += r'CPU Frequency: N/A GHz' + '\n'
 
         sys_info += r'CPU Usage: {0}%'.format(psutil.cpu_percent()) + '\n\n'
         sys_info += r'RAM: {0}'.format(toolkit.get_readable_size(psutil.virtual_memory().total)) + '\n'
