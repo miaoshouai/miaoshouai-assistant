@@ -1,0 +1,660 @@
+[
+    {
+        "id": 1,
+        "name": "Controlnet 1.0",
+        "description": "<p>This repository hosts pruned .safetensors modules of ControlNet, by lllyasviel and T2I-Adapters, TencentARC Team\n\nThe modules are meant for this extension for AUTOMATIC1111/stable-diffusion-webui, but should work for different webuis too if they have it implemented. cheers!\uD83E\uDD42</p></li></ol>",
+        "type": "Checkpoint",
+        "poi": false,
+        "nsfw": false,
+        "allowNoCredit": true,
+        "allowCommercialUse": "Rent",
+        "allowDerivatives": true,
+        "allowDifferentLicense": true,
+        "stats": {
+            "downloadCount": 865,
+            "favoriteCount": 190,
+            "commentCount": 7,
+            "ratingCount": 2,
+            "rating": 5
+        },
+        "creator": {
+            "username": "lllyasviel",
+            "image": "https://huggingface.co/webui/ControlNet-modules-safetensors"
+        },
+        "tags": [],
+        "modelVersions": [
+            {
+                "id": 1,
+                "modelId": 7019,
+                "name": "Controlnet 1.0",
+                "createdAt": "2023-02-06T13:52:34.605Z",
+                "updatedAt": "2023-02-06T13:52:34.605Z",
+                "trainedWords": [],
+                "baseModel": "SD 1.5",
+                "earlyAccessTimeFrame": 0,
+                "description": "<p></p>",
+                "files": [
+                    {
+                        "name": "control_canny-fp16.safetensors",
+                        "id": 1,
+                        "sizeKB": 161261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_canny-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_depth-fp16.safetensors",
+                        "id": 2,
+                        "sizeKB": 741261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_depth-fp16.safetensors",
+                        "primary": true
+                    },
+                    {
+                        "name": "control_hed-fp16.safetensors",
+                        "id": 3,
+                        "sizeKB": 741261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_hed-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_mlsd-fp16.safetensors",
+                        "id": 4,
+                        "sizeKB": 741261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_mlsd-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_normal-fp16.safetensors",
+                        "id": 5,
+                        "sizeKB": 741261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_normal-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_openpose-fp16.safetensors",
+                        "id": 6,
+                        "sizeKB": 741261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_openpose-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_scribble-fp16.safetensors",
+                        "id": 7,
+                        "sizeKB": 741261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_scribble-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_seg-fp16.safetensors",
+                        "id": 8,
+                        "sizeKB": 161261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/control_seg-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "t2iadapter_canny-fp16.safetensors",
+                        "id": 9,
+                        "sizeKB": 38261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/t2iadapter_canny-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "t2iadapter_color-fp16.safetensors",
+                        "id": 10,
+                        "sizeKB": 161261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/t2iadapter_color-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "t2iadapter_depth-fp16.safetensors",
+                        "id": 11,
+                        "sizeKB": 161261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/t2iadapter_depth-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "t2iadapter_keypose-fp16.safetensors",
+                        "id": 12,
+                        "sizeKB": 161261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/t2iadapter_keypose-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "t2iadapter_openpose-fp16.safetensors",
+                        "id": 13,
+                        "sizeKB": 161261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/t2iadapter_openpose-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "t2iadapter_seg-fp16.safetensors",
+                        "id": 14,
+                        "sizeKB": 161261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/t2iadapter_seg-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "t2iadapter_sketch-fp16.safetensors",
+                        "id": 15,
+                        "sizeKB": 161261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/t2iadapter_sketch-fp16.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "t2iadapter_style-fp16.safetensors",
+                        "id": 16,
+                        "sizeKB": 78261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/webui/ControlNet-modules-safetensors/resolve/main/t2iadapter_style-fp16.safetensors",
+                        "primary": false
+                    }
+                ],
+                "images": [
+                    {
+                        "url": "https://msdn.miaoshouai.com/msai/kt/ez/9900922.png"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Controlnet 1.1",
+        "description": "<p>Stable Diffusion v2-1 Model Card\\nThis model card focuses on the model associated with the Stable Diffusion v2-1 model, codebase available here.\\n\\nThis stable-diffusion-2-1 model is fine-tuned from stable-diffusion-2 (768-v-ema.ckpt) with an additional 55k steps on the same dataset (with punsafe=0.1), and then fine-tuned for another 155k extra steps with punsafe=0.98.\\n\\nUse it with the stablediffusion repository: download the v2-1_768-ema-pruned.ckpt here.\\nUse it with \\uD83E\\uDDE8 diffusers\\nModel Details\\nDeveloped by: Robin Rombach, Patrick Esser\\n\\nModel type: Diffusion-based text-to-image generation model\\n\\nLanguage(s): English\\n\\nLicense: CreativeML Open RAIL++-M License\\n\\nModel Description: This is a model that can be used to generate and modify images based on text prompts. It is a Latent Diffusion Model that uses a fixed, pretrained text encoder (OpenCLIP-ViT/H).\\n\\nResources for more information: GitHub Repository.</p></li></ol>\",</p></li></ol>",
+        "type": "Checkpoint",
+        "poi": false,
+        "nsfw": false,
+        "allowNoCredit": true,
+        "allowCommercialUse": "Rent",
+        "allowDerivatives": true,
+        "allowDifferentLicense": true,
+        "stats": {
+            "downloadCount": 865,
+            "favoriteCount": 190,
+            "commentCount": 7,
+            "ratingCount": 2,
+            "rating": 5
+        },
+        "creator": {
+            "username": "lllyasviel",
+            "image": "https://huggingface.co/lllyasviel/ControlNet-v1-1"
+        },
+        "tags": [],
+        "modelVersions": [
+            {
+                "id": 2,
+                "modelId": 2,
+                "name": "Controlnet 1.1",
+                "createdAt": "2023-02-06T13:52:34.605Z",
+                "updatedAt": "2023-02-06T13:52:34.605Z",
+                "trainedWords": [],
+                "baseModel": "SD 1.5",
+                "earlyAccessTimeFrame": 0,
+                "description": "<p></p>",
+                "files": [
+                    {
+                        "name": "control_v11e_sd15_ip2p.pth",
+                        "id": 18,
+                        "sizeKB": 1561261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11e_sd15_ip2p.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11e_sd15_shuffle.pth",
+                        "id": 19,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11e_sd15_shuffle.pth",
+                        "primary": true
+                    },
+                    {
+                        "name": "control_v11f1p_sd15_depth.pth",
+                        "id": 20,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11f1p_sd15_depth.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_canny.pth",
+                        "id": 21,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_canny.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_inpaint.pth",
+                        "id": 22,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_inpaint.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_lineart.pth",
+                        "id": 23,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_lineart.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_mlsd.pth",
+                        "id": 24,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_mlsd.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_normalbae.pth",
+                        "id": 25,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_normalbae.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_openpose.pth",
+                        "id": 26,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_scribble.pth",
+                        "id": 27,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_scribble.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_seg.pth",
+                        "id": 28,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_seg.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15_softedge.pth",
+                        "id": 29,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_softedge.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11p_sd15s2_lineart_anime.pth",
+                        "id": 30,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15s2_lineart_anime.pth",
+                        "primary": false
+                    },
+                    {
+                        "name": "control_v11u_sd15_tile.pth",
+                        "id": 31,
+                        "sizeKB": 1521261.130859375,
+                        "type": "Model",
+                        "format": "Controlnet",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11u_sd15_tile.pth",
+                        "primary": false
+                    }
+                ],
+                "images": [
+                    {
+                        "url": "https://msdn.miaoshouai.com/msai/kt/ez/9900922.png"
+                    }
+                ]
+            }
+        ]
+    }
+]

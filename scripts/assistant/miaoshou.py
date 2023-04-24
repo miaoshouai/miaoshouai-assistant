@@ -6,9 +6,12 @@ import gradio as gr
 
 import launch
 import modules
+from modules import shared
 from scripts.logging.msai_logger import Logger
 from scripts.runtime.msai_prelude import MiaoshouPrelude
 from scripts.runtime.msai_runtime import MiaoshouRuntime
+import modules.generation_parameters_copypaste as parameters_copypaste
+from modules.ui_components import ToolButton
 
 
 class MiaoShouAssistant(object):
@@ -20,6 +23,7 @@ class MiaoShouAssistant(object):
         self.prelude = MiaoshouPrelude()
         self.runtime = MiaoshouRuntime()
         self.refresh_symbol = '\U0001f504'
+        self.folder_symbol = '\U0001f4c2'  # 📂
 
     def on_event_ui_tabs_opened(self) -> t.List[t.Optional[t.Tuple[t.Any, str, str]]]:
         with gr.Blocks(analytics_enabled=False, css=MiaoShouAssistant.default_css) as miaoshou_assistant:
@@ -36,19 +40,20 @@ class MiaoShouAssistant(object):
                     gpu, theme, port, chk_args, txt_args, webui_ver = self.runtime.get_default_args()
                     gr.Markdown(value="Argument settings")
                     with gr.Row():
-                        drp_gpu = gr.Dropdown(label="", elem_id="drp_args_vram",
+                        self.drp_gpu = gr.Dropdown(label="VRAM Size", elem_id="drp_args_vram",
                                               choices=list(self.prelude.gpu_setting.keys()),
                                               value=gpu, interactive=True)
-                        drp_theme = gr.Dropdown(label="UI Theme", choices=list(self.prelude.theme_setting.keys()),
+                        self.drp_theme = gr.Dropdown(label="UI Theme", choices=list(self.prelude.theme_setting.keys()),
                                                 value=theme,
                                                 elem_id="drp_args_theme", interactive=True)
-                        txt_listen_port = gr.Text(label='Listen Port', value=port, elem_id="txt_args_listen_port",
+                        self.txt_listen_port = gr.Text(label='Listen Port', value=port, elem_id="txt_args_listen_port",
                                                   interactive=True)
 
                     with gr.Row():
-                        chk_group_args = gr.CheckboxGroup(choices=list(self.prelude.checkboxes.keys()), value=chk_args,
+
+                        self.chk_group_args = gr.CheckboxGroup(choices=list(self.prelude.checkboxes.keys()), value=chk_args,
                                                           show_label=False)
-                    additional_args = gr.Text(label='COMMANDLINE_ARGS (Divide by space)', value=txt_args,
+                    self.additional_args = gr.Text(label='COMMANDLINE_ARGS (Divide by space)', value=txt_args,
                                               elem_id="txt_args_more", interactive=True)
 
                     with gr.Row():
@@ -61,13 +66,15 @@ class MiaoShouAssistant(object):
                             gr.HTML(
                                 '<div><p>*Save your settings to webui-user.bat file. Use Python Integrated only if your'
                                 ' WebUI is extracted from a zip file and does not need python installation</p></div>')
-                            save_settings = gr.Button(value="Save settings", elem_id="btn_arg_save_setting")
+                            save_settings = gr.Button(value="Save Boot Settings", elem_id="btn_arg_save_setting")
 
                     with gr.Row():
                         # with gr.Column():
                         #    settings_submit = gr.Button(value="Apply settings", variant='primary', elem_id="ms_settings_submit")
                         # with gr.Column():
-                        restart_gradio = gr.Button(value='Apply & Restart WebUI', variant='primary',
+                        btn_apply = gr.Button(value='Apply Settings', variant='primary',
+                                                   elem_id="ms_settings_restart_gradio")
+                        restart_gradio = gr.Button(value='Restart WebUI', variant='primary',
                                                    elem_id="ms_settings_restart_gradio")
 
                         '''def mod_args(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
@@ -83,11 +90,21 @@ class MiaoShouAssistant(object):
                         settings_submit.click(mod_args, inputs=[drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args], outputs=[])'''
 
                     save_settings.click(self.runtime.change_boot_setting,
-                                        inputs=[drp_choose_version, drp_gpu, drp_theme, txt_listen_port, chk_group_args,
-                                                additional_args], outputs=[txt_save_status])
+                                        inputs=[drp_choose_version, self.drp_gpu, self.drp_theme, self.txt_listen_port, self.chk_group_args,
+                                                self.additional_args], outputs=[txt_save_status])
+                    btn_apply.click(
+                        self.save_cmdline_args,
+                        inputs=[self.drp_gpu, self.drp_theme, self.txt_listen_port, self.chk_group_args,
+                                self.additional_args],
+                        outputs=[txt_save_status],
+                    )
+
+                    def request_restart():
+                        shared.state.interrupt()
+                        shared.state.need_restart = True
 
                     restart_gradio.click(
-                        fn=self.request_restart,
+                        request_restart,
                         _js='restart_reload',
                         inputs=[],
                         outputs=[],
@@ -102,51 +119,99 @@ class MiaoShouAssistant(object):
                     with gr.Row():
                         sys_info_refbtn = gr.Button(value="Refresh")
 
-        drp_gpu.change(self.runtime.update_xformers, inputs=[drp_gpu, chk_group_args], outputs=[chk_group_args])
+        def update_chkbox(chkbox):
+            print(chkbox)
+
+        self.drp_gpu.change(self.runtime.update_xformers, inputs=[self.drp_gpu, self.chk_group_args], outputs=[self.chk_group_args])
+        self.chk_group_args.change(update_chkbox, inputs=[self.chk_group_args], outputs=[])
         sys_info_refbtn.click(self.prelude.get_sys_info, None, txt_sys_info)
+
 
     def create_subtab_model_management(self) -> None:
         with gr.TabItem('Model Management', elem_id="model_management_tab") as tab_batch:
             with gr.Row():
                 with gr.Column():
-                    my_models = self.runtime.get_local_models()
-                    ds_my_models = gr.Dataset(
-                        components=[gr.HTML(visible=False, label='Cover', elem_id='my_model_cover'),
-                                    gr.Textbox(visible=False, label='Name/Version'),
-                                    gr.Textbox(visible=False, label='File Name'),
-                                    gr.Textbox(visible=False, label='Hash'), gr.Textbox(visible=False, label='Creator'),
-                                    gr.Textbox(visible=False, label='Type'), gr.Textbox(visible=False, label='NSFW'),
-                                    gr.Textbox(visible=False, label='Trigger Words', elem_id='my_model_trigger_words')],
-                        elem_id='my_model_lib',
-                        label="My Models",
-                        headers=None,
-                        samples=my_models,
-                        samples_per_page=50)
-                with gr.Column():
-                    html_model_prompt = gr.HTML(visible=True,
-                                                value='<div style="height:400px;"><p>No Model Selected</p></div>')
+                    with gr.Row():
+                        gr.Markdown(value="If you want your model directory to be other than [your_webui_dir]\\models, select a new directory down below. "
+                                          "Your default models directory needs to be removed first before you apply. Make sure do your backups!")
+                        md_result = gr.Markdown(visible=False, value="")
+                    with gr.Row():
+                        model_folder_path = gr.Textbox("", label="Model path", interactive=False)
+                        open_folder_button = ToolButton(value=self.folder_symbol,
+                                                        elem_id="hidden_element" if shared.cmd_opts.hide_ui_dir_config else "open_folder_metadata_editor")
+                        refresh_models_button = ToolButton(value=self.refresh_symbol, elem_id="hidden_element")
+                    with gr.Row():
+                        btn_connect_modeldir = gr.Button(value="Apply Virtual Model Folder")
 
-            with gr.Row():
-                add = gr.Button(value="Add", variant="primary")
-                # delete = gr.Button(value="Delete")
-            with gr.Row():
-                reset_btn = gr.Button(value="Reset")
-                json_input = gr.Button(value="Load from JSON")
-                png_input = gr.Button(value="Detect from image")
-                png_input_area = gr.Image(label="Detect from image", elem_id="openpose_editor_input")
-                bg_input = gr.Button(value="Add Background image")
+                    with gr.Row():
+                        my_models = self.runtime.get_local_models()
+                        self.runtime.ds_my_models = gr.Dataset(
+                            components=[gr.Image(visible=False, label='Cover', elem_id='my_model_cover'),
+                                        gr.Textbox(visible=False, label='ModelId'),
+                                        gr.Textbox(visible=False, label='Name/Version'),
+                                        gr.Textbox(visible=False, label='File Name'),
+                                        gr.Textbox(visible=False, label='Hash'), gr.Textbox(visible=False, label='Creator'),
+                                        gr.Textbox(visible=False, label='Type'), gr.Textbox(visible=False, label='NSFW'),
+                                        gr.Textbox(visible=False, label='Trigger Words', elem_id='my_model_trigger_words')],
+                            elem_id='my_model_lib',
+                            label="My Models",
+                            headers=None,
+                            samples=my_models,
+                            samples_per_page=50)
+                with gr.Column():
+                    self.runtime.ds_my_model_covers = gr.Dataset(components=[gr.HTML(visible=False)],
+                                                    elem_id='my_model_covers',
+                                                    label="Model Cover",
+                                                    headers=None,
+                                                    samples=[],
+                                                    samples_per_page=10)
+                    with gr.Row(variant='panel'):
+                        btn_set_cover = gr.Button(visible=False, value='Set as Cover')
+                    with gr.Row(variant='panel'):
+                        c_image = gr.Image(elem_id="pnginfo_image", label="Source", source="upload", interactive=True,
+                                         type="pil", visible=False)
+
+                    with gr.Row(variant='panel'):
+                        generation_info = gr.Textbox(label='prompt', interactive=False, visible=True, elem_id="imginfo_generation_info")
+
+                    with gr.Row(variant='panel'):
+                        with gr.Row():
+                            buttons = parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
+
+                        for tabname, button in buttons.items():
+                            parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(
+                                paste_button=button, tabname=tabname, source_text_component=generation_info,
+                                source_image_component=c_image,
+                            ))
+
+        btn_set_cover.click(self.runtime.set_cover, inputs=[self.runtime.ds_my_models, c_image], outputs=[self.runtime.ds_my_models])
+        open_folder_button.click(self.runtime.open_folder, inputs=[model_folder_path], outputs=[model_folder_path])
+        btn_connect_modeldir.click(self.runtime.change_model_folder, inputs=[model_folder_path], outputs=[md_result])
+        refresh_models_button.click(self.runtime.refresh_local_models, inputs=[], outputs=[self.runtime.ds_my_models])
+
+        self.runtime.ds_my_models.click(self.runtime.get_my_model_covers,
+                                     inputs=[self.runtime.ds_my_models],
+                                     outputs=[self.runtime.ds_my_model_covers])
+
+        self.runtime.ds_my_model_covers.click(self.runtime.update_cover_info,
+                                        inputs=[self.runtime.ds_my_models, self.runtime.ds_my_model_covers],
+                                        outputs=[btn_set_cover, generation_info, c_image])
+
 
     def create_subtab_model_download(self) -> None:
         with gr.TabItem('Model Download', elem_id="model_download_tab") as tab_downloads:
             with gr.Row():
                 with gr.Column(elem_id="col_model_list"):
                     with gr.Row().style(equal_height=True):
-                        model_source_dropdown = gr.Dropdown(choices=["civitai", "liandange"],
+                        model_source_dropdown = gr.Dropdown(choices=["civitai.com", "liandange.com", "official_models", "controlnet"],
                                                             value=self.runtime.model_source,
                                                             label="Select Model Source",
                                                             type="value",
                                                             show_label=True,
                                                             elem_id="model_source").style(full_width=True)
+
+                        #btn_fetch = gr.Button("Fetch")
+
                     with gr.Row().style(equal_height=True):
                         search_text = gr.Textbox(
                             label="Model name",
@@ -187,13 +252,13 @@ class MiaoShouAssistant(object):
                                                      value='Select Model', elem_id='ms_dwn_button',
                                                      interactive=True)
 
-                        is_civitai_model_source_active = self.runtime.model_source == "civitai"
+                        is_civitai_model_source_active = self.runtime.model_source == "civitai.com"
                         with gr.Row(variant="panel"):
                             dwn_button = gr.Button(value='Download',
                                                    visible=is_civitai_model_source_active, elem_id='ms_dwn_button')
                             open_url_in_browser_newtab_button = gr.HTML(
                                 value='<p style="text-align: center;">'
-                                      '<a style="text-align: center;" href="https://models.paomiantv.cn/models" '
+                                      '<a style="text-align: center;" href="http://www.liandange.com/models" '
                                       'target="_blank">Download</a></p>',
                                 visible=not is_civitai_model_source_active)
                     with gr.Row():
@@ -203,6 +268,8 @@ class MiaoShouAssistant(object):
                             outputs=self.runtime.ds_models)
 
         model_type.change(self.runtime.search_model, inputs=[search_text, model_type], outputs=self.runtime.ds_models)
+
+        #btn_fetch.click(self.runtime.refresh_all_models, inputs=[], outputs=self.runtime.ds_models)
 
         btn_search.click(self.runtime.search_model, inputs=[search_text, model_type], outputs=self.runtime.ds_models)
 
@@ -220,34 +287,38 @@ class MiaoShouAssistant(object):
 
         model_source_dropdown.change(self.switch_model_source,
                                      inputs=[model_source_dropdown],
-                                     outputs=[self.runtime.ds_models, dwn_button, open_url_in_browser_newtab_button])
+                                     outputs=[self.runtime.ds_models, self.runtime.ds_my_models, dwn_button, open_url_in_browser_newtab_button])
 
-    def request_restart(self, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
-        print('request_restart: cmd_arg  = ', self.runtime.cmdline_args)
-        print('request_restart: sys.argv = ', sys.argv)
-
-        modules.shared.state.interrupt()
-        modules.shared.state.need_restart = True
+    def save_cmdline_args(self, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
+        #print(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
+        self.runtime.get_final_args(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
+        #print('request_restart: cmd_arg  = ', self.runtime.cmdline_args)
+        #print('request_restart: sys.argv = ', sys.argv)
 
         # reset args
         sys.argv = [sys.argv[0]]
         os.environ['COMMANDLINE_ARGS'] = ""
-        print('remove', sys.argv)
+        #print('remove', sys.argv)
 
-        for arg in self.runtime.cmdline_args:
+        for arg in list(dict.fromkeys(self.runtime.cmdline_args)):
             sys.argv.append(arg)
 
-        print('after', sys.argv)
+        print('saved args', sys.argv)
         launch.prepare_environment()
-        launch.start()
+        #launch.start()
+        return gr.Markdown.update(value="Settings Saved", visible=True)
 
     def switch_model_source(self, new_model_source: str):
         self.runtime.model_source = new_model_source
-        show_download_button = self.runtime.model_source == "civitai"
+        show_download_button = self.runtime.model_source != "liandange.com"
         images = self.runtime.get_images_html()
         self.runtime.ds_models.samples = images
+        my_models = self.runtime.get_local_models()
+        self.runtime.ds_my_models.samples = my_models
+
         return (
             gr.Dataset.update(samples=images),
+            gr.Dataset.update(samples=my_models),
             gr.Button.update(visible=show_download_button),
             gr.HTML.update(visible=not show_download_button)
         )
