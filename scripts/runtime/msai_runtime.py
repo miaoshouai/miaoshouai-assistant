@@ -359,6 +359,9 @@ class MiaoshouRuntime(object):
         else:
             cover_img = self.prelude.no_preview_img
 
+        if not os.path.exists(self.prelude.cover_folder):
+            os.mkdir(self.prelude.cover_folder)
+
         dst = os.path.join(self.prelude.cover_folder, os.path.basename(cover_img))
         if cover_img != self.prelude.no_preview_img and not os.path.exists(dst):
             shutil.copyfile(cover_img, dst)
@@ -568,6 +571,9 @@ class MiaoshouRuntime(object):
                     generation_info += f"Steps: {meta['steps']}, Sampler: {meta['sampler']}, "
                     generation_info += f"CFG scale: {meta['cfgScale']}, Seed: {meta['seed']}, Size: {meta['Size']},"
                     generation_info += f"Model hash: {meta['Model hash']}"
+
+                    if not os.path.exists(self.prelude.cache_folder):
+                        os.mkdir(self.prelude.cache_folder)
 
                     if self.model_source == 'civitai.com':
                         fname = os.path.join(self.prelude.cache_folder, f"{cover_url.split('/')[-1]}.jpg")

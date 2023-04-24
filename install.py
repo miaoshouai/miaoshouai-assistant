@@ -17,15 +17,6 @@ def install_preset_models_if_needed():
                     with open(target_file, "w") as model_file:
                         model_file.write(content)
 
-def create_folders():
-    cover_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "cover")
-    cache_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "cache")
-
-    if not os.path.exists(cover_folder):
-        os.mkdir(cover_folder)
-    if not os.path.exists(cache_folder):
-        os.mkdir(cache_folder)
-
 req_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "requirements.txt")
 
 with open(req_file) as file:
@@ -35,5 +26,4 @@ with open(req_file) as file:
             launch.run_pip(f"install {lib}", f"Miaoshou assistant requirement: {lib}")
 
 install_preset_models_if_needed()
-create_folders()
 
