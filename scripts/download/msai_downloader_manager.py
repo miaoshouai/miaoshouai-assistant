@@ -10,6 +10,7 @@ from scripts.download.msai_file_downloader import MiaoshouFileDownloader
 from scripts.logging.msai_logger import Logger
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
 import scripts.msai_utils.msai_toolkit as toolkit
+from urllib.request import Request, urlopen
 
 
 class DownloadingEntry(object):
@@ -185,6 +186,14 @@ class MiaoshouDownloaderManager(metaclass=MiaoshouSingleton):
 
     def download(self, source_url: str, target_file: str, estimated_total_size: float,
                  expected_checksum: str = None) -> None:
+
+        resp = requests.get(source_url, stream=True)
+        length = resp.headers.get("Content-length")
+        if length is not None:
+            estimated_total_size = float(length)
+        #estimated_total_size = meta.getheaders("Content-Length")[0]
+        print(estimated_total_size)
+
         target_dir = os.path.dirname(target_file)
         target_filename = os.path.basename(target_file)
         download_entry = DownloadingEntry(
