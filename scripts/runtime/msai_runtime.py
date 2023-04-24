@@ -10,8 +10,12 @@ import typing as t
 
 import gradio as gr
 import requests
-
+from bs4 import BeautifulSoup
+import subprocess
+from subprocess import check_output
 import modules
+from tkinter import filedialog, Tk
+from modules import shared
 from modules.sd_models import CheckpointInfo
 from scripts.download.msai_downloader_manager import MiaoshouDownloaderManager
 from scripts.logging.msai_logger import Logger
@@ -28,8 +32,10 @@ class MiaoshouRuntime(object):
         self._model_set: t.List[t.Dict] = None
         self._model_set_last_access_time: datetime.datetime = None
         self._ds_models: gr.Dataset = None
+        self._ds_my_models: gr.Dataset = None
+        self._ds_my_model_covers: gr.Dataset = None
         self._allow_nsfw: bool = False
-        self._model_source: str = "civitai"  # civitai is the default model source
+        self._model_source: str = "civitai.com"  # civitai is the default model source
 
         # TODO: may be owned by downloader class
         self.model_files = []
@@ -39,7 +45,7 @@ class MiaoshouRuntime(object):
     def get_default_args(self, commandline_args: t.List[str] = None):
         if commandline_args is None:
             commandline_args: t.List[str] = toolkit.get_args(sys.argv[1:])
-        self.cmdline_args = commandline_args
+        self.cmdline_args = list(dict.fromkeys(commandline_args))
         self.logger.info(f"default commandline args: {commandline_args}")
 
         checkbox_values = []
@@ -58,7 +64,7 @@ class MiaoshouRuntime(object):
 
         for chk in self.prelude.checkboxes:
             for arg in commandline_args:
-                if self.prelude.checkboxes[chk] == arg:
+                if self.prelude.checkboxes[chk] == arg and chk not in checkbox_values:
                     checkbox_values.append(chk)
 
         gpu_arg_list = [f'--{i.strip()}' for i in ' '.join(list(self.prelude.gpu_setting.values())).split('--')]
@@ -76,9 +82,14 @@ class MiaoshouRuntime(object):
 
     def add_arg(self, args: str = "") -> None:
         for arg in args.split('--'):
-            self.logger.info(f'add arg: {arg.strip()}')
             if f"--{arg.strip()}" not in self.cmdline_args and arg.strip() != '':
+                self.logger.info(f'add arg: {arg.strip()}')
                 self.cmdline_args.append(f'--{arg.strip()}')
+                print('added', self.cmdline_args)
+
+        #remove duplicates
+        self.cmdline_args = list(dict.fromkeys(self.cmdline_args))
+        print('added dup',self.cmdline_args)
 
     def remove_arg(self, args: str = "") -> None:
         arg_keywords = ['port', 'theme']
@@ -92,8 +103,15 @@ class MiaoshouRuntime(object):
             elif f'--{arg.strip()}' in self.cmdline_args and arg.strip() != '':
                 print(f"remove args:{arg.strip()}")
                 self.cmdline_args.remove(f'--{arg.strip()}')
+                print('removed', self.cmdline_args)
+
+        # remove duplicates
+        self.cmdline_args = list(dict.fromkeys(self.cmdline_args))
+        print('removed dup',self.cmdline_args)
 
     def get_final_args(self, gpu, theme, port, checkgroup, more_args) -> None:
+        # remove duplicates
+        self.cmdline_args = list(dict.fromkeys(self.cmdline_args))
         # gpu settings
         for s1 in self.prelude.gpu_setting:
             if s1 in gpu:
@@ -129,6 +147,7 @@ class MiaoshouRuntime(object):
         self._old_additional = more_args.replace('\\\\', '\\')
 
     def fetch_all_models(self) -> t.List[t.Dict]:
+        print('start fetching...')
         endpoint_url = self.prelude.api_url(self.model_source)
         if endpoint_url is None:
             self.logger.error(f"{self.model_source} is not supported")
@@ -141,16 +160,22 @@ class MiaoshouRuntime(object):
         all_set = []
         response = requests.get(endpoint_url + f'?page=1&limit={limit_threshold}')
         num_of_pages = response.json()['metadata']['totalPages']
+        total_items = response.json()['metadata']['totalItems']
+        remain_items = total_items
         self.logger.info(f"total pages = {num_of_pages}")
 
         continuous_error_counts = 0
 
-        for p in range(1, num_of_pages + 1):
+        for p in range(1, num_of_pages+2):
             try:
+                remain_items -= limit_threshold
+                print(remain_items)
+                if remain_items < limit_threshold:
+                    limit_threshold = remain_items
                 response = requests.get(endpoint_url + f'?page={p}&limit={limit_threshold}')
                 payload = response.json()
                 if payload.get("success") is not None and not payload.get("success"):
-                    self.logger.error(f"failed to fetch page[{p + 1}]")
+                    self.logger.error(f"failed to fetch page[{p}]")
                     continuous_error_counts += 1
                     if continuous_error_counts > 10:
                         break
@@ -161,11 +186,12 @@ class MiaoshouRuntime(object):
                 self.logger.debug(f"start to process page[{p}]")
 
                 for model in payload['items']:
+                    print(f"{p}/{num_of_pages}: model")
                     all_set.append(model)
 
                 self.logger.debug(f"page[{p}] : {len(payload['items'])} items added")
             except Exception as e:
-                self.logger.error(f"failed to fetch page[{p + 1}] due to {e}")
+                self.logger.error(f"failed to fetch page[{p}] due to {e}")
                 time.sleep(3)
 
         if len(all_set) > 0:
@@ -270,16 +296,17 @@ class MiaoshouRuntime(object):
             if chkpt_info.sha256 is None and chkpt_info.shorthash is None:
                 chkpt_info = self.get_hash_from_json(chkpt_info)
 
+            model_info = self.search_model_by_hash(chkpt_info)
             fname = re.sub(r'\[.*?\]', "", chkpt_info.title)
-            model_info = self.search_model_by_hash(chkpt_info.sha256, chkpt_info.shorthash, fname)
+
             if model_info is not None:
                 models.append(model_info)
             else:
                 self.logger.info(
                     f"{chkpt_info.title}, {chkpt_info.hash}, {chkpt_info.shorthash}, {chkpt_info.sha256}")
                 models.append([
-                    [f'<img src="file={os.path.join(modules.paths.script_path, "html", "card-no-preview.png")}" '
-                     'style="width:100px;height:150px;">'],
+                    self.prelude.no_preview_img,
+                    0,
                     [os.path.basename(fname)],
                     [fname],
                     [chkpt_info.shorthash],
@@ -287,12 +314,57 @@ class MiaoshouRuntime(object):
 
         return models
 
-    def search_model_by_hash(self, lookup_sha256: str, lookup_shash: str, fname: str) -> t.Optional[t.List[t.Any]]:
+
+    def refresh_local_models(self) -> t.Dict:
+        my_models = self.get_local_models()
+        self.ds_my_models.samples = my_models
+
+        return gr.Dataset.update(samples=my_models)
+
+    def set_cover(self, model, cover):
+        fname = model[3][0]
+        mname, ext = os.path.splitext(fname)
+
+        dst = os.path.join(shared.models_path, 'Stable-diffusion', f'{mname}.jpg')
+        print(dst)
+        cover.save(dst)
+
+        my_models = self.get_local_models()
+        self.ds_my_models.samples = my_models
+
+        return gr.Dataset.update(samples=my_models)
+
+
+
+    def search_model_by_hash(self, chkpt_info) -> t.Optional[t.List[t.Any]]:
+
+        lookup_sha256 = chkpt_info.sha256
+        lookup_shash = chkpt_info.shorthash
+        fname = re.sub(r'\[.*?\]', "", chkpt_info.title)
+
         self.logger.info(f"lookup_sha256: {lookup_sha256}, lookup_shash: {lookup_shash}, fname: {fname}")
 
         res = None
         if lookup_sha256 is None and lookup_shash is None:
             return None
+
+        mpath = (os.path.join(shared.models_path, chkpt_info.filename))
+        prefix, ext = os.path.splitext(mpath)
+        if os.path.exists(f'{prefix}.jpg'):
+            cover_img = os.path.join(shared.models_path, 'Stable-diffusion', f'{os.path.basename(prefix)}.jpg')
+        elif os.path.exists(f'{prefix}.png'):
+            cover_img = os.path.join(shared.models_path, 'Stable-diffusion', f'{os.path.basename(prefix)}.png')
+        elif os.path.exists(f'{prefix}.webp'):
+            cover_img = os.path.join(shared.models_path, 'Stable-diffusion', f'{os.path.basename(prefix)}.webp')
+        else:
+            cover_img = self.prelude.no_preview_img
+
+        dst = os.path.join(self.prelude.cover_folder, os.path.basename(cover_img))
+        if cover_img != self.prelude.no_preview_img and not os.path.exists(dst):
+            shutil.copyfile(cover_img, dst)
+        elif cover_img == self.prelude.no_preview_img:
+            dst = cover_img
+
 
         for model in self.model_set:
             match = False
@@ -305,11 +377,11 @@ class MiaoshouRuntime(object):
                         match = (lookup_shash[:10].upper() in [h.upper() for h in file['hashes'].values()])
 
                     if match:
-                        cover_link = ver['images'][0]['url'].replace('width=450', 'width=100')
+                        #cover_link = ver['images'][0]['url'].replace('width=450', 'width=100')
                         mid = model['id']
                         res = [
-                            [
-                                f'<a href="https://civitai.com/models/{mid}" target="_blank"><img src="{cover_link}"></a>'],
+                            dst,
+                            mid,
                             [f"{model['name']}/{ver['name']}"],
                             [fname],
                             [lookup_shash],
@@ -356,10 +428,16 @@ class MiaoshouRuntime(object):
         cover_imgs = []
         htmlDetail = "<div><p>Empty</p></div>"
 
+
         mid = models[1]
 
         # TODO: use map to enhance the performances
-        m = [e for e in self.model_set if e['id'] == mid][0]
+        m_list = [e for e in self.model_set if e['id'] == mid]
+
+        if m_list is not None or m_list != []:
+            m = m_list[0]
+        else:
+            return [[]], {}, '', {}
 
         self.model_files.clear()
 
@@ -443,6 +521,69 @@ class MiaoshouRuntime(object):
                                  'target="_blank">Download</a></p>')
         )
 
+    def get_my_model_covers(self, model):
+        img_list, l1, h1, h2 = self.get_model_info(model)
+        if self._ds_my_model_covers is None:
+            self.logger.error(f"_ds_my_model_covers is not initialized")
+            return {}
+
+        cover_list = []
+        for img_link in img_list:
+            cover_html = '<div style="display: flex; align-items: center;">\n'
+            cover_html += f'<div style = "margin-right: 10px;" class ="model-item" >\n'
+            cover_html += f'<img src="{img_link[0].replace("width=450","width=100")}" style="width:100px;">\n</div>\n'
+            cover_html += '</div>'
+            cover_list.append([cover_html])
+
+        self._ds_my_model_covers.samples = cover_list
+        return self._ds_my_model_covers.update(samples=cover_list)
+
+
+    def update_cover_info(self, model, covers):
+        soup = BeautifulSoup(covers[0])
+        cover_url = soup.findAll('img')[0]['src'].replace('width=100', 'width=450')
+
+        if self.model_set is None:
+            self.logger.error("model_set is null")
+            return []
+
+        mid = model[1]
+        m_list = [e for e in self.model_set if e['id'] == mid]
+        if m_list is not None or m_list != []:
+            m = m_list[0]
+        else:
+            return {}, {}
+
+        generation_info = ''
+        fname = None
+        for mv in m['modelVersions']:
+            for img in mv['images']:
+                if img['url'] == cover_url:
+                    if img['meta'] is None or img['meta'] == '':
+                        break
+
+                    meta = img['meta']
+                    generation_info += f"{meta['prompt']}\n"
+                    generation_info += f"Negative prompt: {meta['negativePrompt']}\n"
+                    generation_info += f"Steps: {meta['steps']}, Sampler: {meta['sampler']}, "
+                    generation_info += f"CFG scale: {meta['cfgScale']}, Seed: {meta['seed']}, Size: {meta['Size']},"
+                    generation_info += f"Model hash: {meta['Model hash']}"
+
+                    if self.model_source == 'civitai.com':
+                        fname = os.path.join(self.prelude.cache_folder, f"{cover_url.split('/')[-1]}.jpg")
+                    elif self.model_source == 'liandange.com':
+                        fname = os.path.join(self.prelude.cache_folder, cover_url.split('?')[0].split('/')[-1])
+
+                    break
+
+        if fname is not None and not os.path.exists(fname):
+            r = requests.get(cover_url, stream=True)
+            r.raw.decode_content = True
+            with open(fname, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+
+        return gr.Button.update(visible=True), gr.Text.update(value=generation_info), gr.Image.update(value=fname)
+
     def get_downloading_status(self):
         (_, _, desc) = self.downloader_manager.tasks_summary()
         return gr.HTML.update(value=desc)
@@ -473,6 +614,9 @@ class MiaoshouRuntime(object):
                 elif f['format'] == 'Hypernetwork':
                     cover_fname = os.path.join(model_path, 'hypernetworks', cover_fname)
                     model_fname = os.path.join(model_path, 'hypernetworks', model_fname)
+                elif f['format'] == 'Controlnet':
+                    cover_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', cover_fname)
+                    model_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', model_fname)
                 else:
                     cover_fname = os.path.join(model_path, 'Stable-diffusion', cover_fname)
                     model_fname = os.path.join(model_path, 'Stable-diffusion', model_fname)
@@ -519,14 +663,58 @@ class MiaoshouRuntime(object):
 
         time.sleep(2)
 
-        self.model_files.clear()
+        #self.model_files.clear()
         return gr.HTML.update(value=f"<h4>{len(urls)} downloading tasks added into task list</h4>")
+
+    def get_dir_and_file(self, file_path):
+        dir_path, file_name = os.path.split(file_path)
+        return (dir_path, file_name)
+
+    def open_folder(self, folder_path=''):
+        if not any(var in os.environ for var in self.prelude.ENV_EXCLUSION) and sys.platform != 'darwin':
+            current_folder_path = folder_path
+
+            initial_dir, initial_file = self.get_dir_and_file(folder_path)
+
+            root = Tk()
+            root.wm_attributes('-topmost', 1)
+            root.withdraw()
+            folder_path = filedialog.askdirectory(initialdir=initial_dir)
+            root.destroy()
+
+            if folder_path == '':
+                folder_path = current_folder_path
+
+        return folder_path
+
+    def change_model_folder(self, folder_path=''):
+
+        res = 'Model folder is linked successfully'
+        if folder_path == '':
+            return gr.Markdown.update(value='No directory is set', visible=True)
+
+        try:
+            src = shared.models_path
+            # Destination file path
+            dst = folder_path
+
+            # Create a symbolic link
+            # pointing to src named dst
+            # using os.symlink() method
+            subprocess.check_call('mklink /J "%s" "%s"' % (src, dst), shell=True)
+        except Exception as e:
+            res = str(e)
+
+        return gr.Markdown.update(value=res, visible=True)
 
     def change_boot_setting(self, version, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
         self.get_final_args(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
         self.logger.info(f'saved_cmd: {self.cmdline_args}')
 
-        target_webui_user_file = "webui-user.bat"
+        if version == 'Official Release':
+            target_webui_user_file = "webui-user.bat"
+        else:
+            target_webui_user_file = "webui-user-launch.bat"
         script_export_keyword = "export"
         if platform.system() == "Linux":
             target_webui_user_file = "webui-user.sh"
@@ -548,7 +736,7 @@ class MiaoshouRuntime(object):
                     for line in file:
                         if 'COMMANDLINE_ARGS' in line:
                             rep_txt = ' '.join(self.cmdline_args).replace('\\', '\\\\')
-                            line = f'{script_export_keyword} COMMANDLINE_ARGS="{rep_txt}"\n'
+                            line = f'{script_export_keyword} COMMANDLINE_ARGS={rep_txt}\n'
                         sys.stdout.write(line)
 
             except Exception as e:
@@ -558,12 +746,20 @@ class MiaoshouRuntime(object):
                 if not os.path.exists(filepath):
                     shutil.copyfile(os.path.join(self.prelude.ext_folder, 'configs', target_webui_user_file), filepath)
 
-                with fileinput.FileInput(filepath, inplace=True, backup='.bak') as file:
-                    for line in file:
+                new_data = ''
+                with open(filepath, 'r+') as file:
+                    data = file.readlines()
+                    for line in data:
                         if 'webui.py' in line:
+                            print('b')
                             rep_txt = ' '.join(self.cmdline_args).replace('\\', '\\\\')
                             line = f"python\python.exe webui.py {rep_txt}\n"
-                        sys.stdout.write(line)
+                        new_data += line
+                        print(line)
+                    file.seek(0)
+                    file.write(new_data)
+                    file.truncate()
+
             except Exception as e:
                 msg = f'Error: {str(e)}'
 
@@ -602,6 +798,22 @@ class MiaoshouRuntime(object):
     @ds_models.setter
     def ds_models(self, newone: gr.Dataset):
         self._ds_models = newone
+
+    @property
+    def ds_my_models(self) -> gr.Dataset:
+        return self._ds_my_models
+
+    @ds_my_models.setter
+    def ds_my_models(self, newone: gr.Dataset):
+        self._ds_my_models = newone
+
+    @property
+    def ds_my_model_covers(self) -> gr.Dataset:
+        return self._ds_my_model_covers
+
+    @ds_my_model_covers.setter
+    def ds_my_model_covers(self, newone: gr.Dataset):
+        self._ds_my_model_covers = newone
 
     @property
     def model_source(self) -> str:

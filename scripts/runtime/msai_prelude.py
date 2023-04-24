@@ -10,6 +10,7 @@ import launch
 from scripts.logging.msai_logger import Logger
 from scripts.msai_utils import msai_toolkit as toolkit
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
+import modules
 
 
 class MiaoshouPrelude(metaclass=MiaoshouSingleton):
@@ -33,15 +34,20 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
 
     def _init_constants(self) -> None:
         self._api_url = {
-            "civitai": "https://civitai.com/api/v1/models",
-            "liandange": "https://model-api.paomiantv.cn/model/api/models",
+            "civitai.com": "https://civitai.com/api/v1/models",
+            "liandange.com": "http://model-api.liandange.com/model/api/models",
         }
         self._ext_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
         self._setting_file = os.path.join(self.ext_folder, "configs", "settings.json")
         self._model_hash_file = os.path.join(self.ext_folder, "configs", "model_hash.json")
+        self._cache_folder = os.path.join(self.ext_folder, "cache")
+        self._cover_folder = os.path.join(self.ext_folder, "covers")
+        self._no_preview_img = os.path.join(modules.paths.script_path, "html", "card-no-preview.png")
         self._model_json = {
-            'civitai': os.path.join(self.ext_folder, 'configs', 'civitai_models.json'),
-            'liandange': os.path.join(self.ext_folder, 'configs', 'liandange_models.json'),
+            'civitai.com': os.path.join(self.ext_folder, 'configs', 'civitai_models.json'),
+            'liandange.com': os.path.join(self.ext_folder, 'configs', 'liandange_models.json'),
+            'official_models': os.path.join(self.ext_folder, 'configs', 'official_models.json'),
+            'controlnet': os.path.join(self.ext_folder, 'configs', 'controlnet.json'),
         }
         self._checkboxes = {
             'Enable xFormers': '--xformers',
@@ -65,6 +71,7 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
             'Light Mode': '--theme=light',
             'Dark Mode': '--theme=dark',
         }
+        self._ENV_EXCLUSION = ['COLAB_GPU', 'RUNPOD_POD_ID']
 
     @property
     def ext_folder(self) -> str:
@@ -94,8 +101,24 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         return self._setting_file
 
     @property
+    def ENV_EXCLUSION(self) -> list[str]:
+        return self._ENV_EXCLUSION
+
+    @property
     def model_hash_file(self) -> str:
         return self._model_hash_file
+
+    @property
+    def cache_folder(self) -> str:
+        return self._cache_folder
+
+    @property
+    def cover_folder(self) -> str:
+        return self._cover_folder
+
+    @property
+    def no_preview_img(self) -> str:
+        return self._no_preview_img
 
     @property
     def checkboxes(self) -> t.Dict[str, str]:
