@@ -2,8 +2,6 @@ import launch
 import os
 import gzip
 import io
-from scripts.runtime.msai_prelude import MiaoshouPrelude
-
 
 def install_preset_models_if_needed():
     assets_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
@@ -20,9 +18,13 @@ def install_preset_models_if_needed():
                         model_file.write(content)
 
 def create_folders():
-    prelude = MiaoshouPrelude()
-    os.mkdir(prelude.cover_folder)
-    os.mkdir(prelude.cache_folder)
+    cover_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "cover")
+    cache_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "cache")
+
+    if not os.path.exists(cover_folder):
+        os.mkdir('cover')
+    if not os.path.exists(cache_folder):
+        os.mkdir('cache')
 
 req_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "requirements.txt")
 
