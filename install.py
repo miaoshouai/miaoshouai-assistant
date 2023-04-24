@@ -22,9 +22,9 @@ def create_folders():
     cache_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "cache")
 
     if not os.path.exists(cover_folder):
-        os.mkdir('cover')
+        os.mkdir(cover_folder)
     if not os.path.exists(cache_folder):
-        os.mkdir('cache')
+        os.mkdir(cache_folder)
 
 req_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "requirements.txt")
 

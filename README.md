@@ -6,7 +6,7 @@ In Automatic1111 WebUI, go to Extensions Tab->Install from URL, copy the followi
 
 https://github.com/miaoshouai/miaoshouai-assistant.git
 
-Click Install
+Click Install, wait until it's done. Go to Settings->
 
 ## **Usage**
 ### Boot Assistant
