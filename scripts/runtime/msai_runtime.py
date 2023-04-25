@@ -14,7 +14,8 @@ from bs4 import BeautifulSoup
 import subprocess
 from subprocess import check_output
 import modules
-from tkinter import filedialog, Tk
+#import tkinter as tk
+#from tkinter import filedialog, ttk
 from modules import shared
 from modules.sd_models import CheckpointInfo
 from scripts.download.msai_downloader_manager import MiaoshouDownloaderManager
@@ -686,11 +687,11 @@ class MiaoshouRuntime(object):
 
             initial_dir, initial_file = self.get_dir_and_file(folder_path)
 
-            root = Tk()
-            root.wm_attributes('-topmost', 1)
-            root.withdraw()
-            folder_path = filedialog.askdirectory(initialdir=initial_dir)
-            root.destroy()
+            #root = tk.Tk()
+            #root.wm_attributes('-topmost', 1)
+            #root.withdraw()
+            #folder_path = filedialog.askdirectory(initialdir=initial_dir)
+            #root.destroy()
 
             if folder_path == '':
                 folder_path = current_folder_path
