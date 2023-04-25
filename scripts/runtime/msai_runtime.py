@@ -593,7 +593,7 @@ class MiaoshouRuntime(object):
             with open(fname, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
 
-        return gr.Button.update(visible=True), gr.Text.update(value=generation_info), gr.Image.update(value=fname, visible=True)
+        return gr.Button.update(visible=True), gr.Text.update(value=generation_info), gr.Image.update(value=fname)
 
     def get_downloading_status(self):
         (_, _, desc) = self.downloader_manager.tasks_summary()
