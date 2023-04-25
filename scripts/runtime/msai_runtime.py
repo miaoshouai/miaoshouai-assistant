@@ -85,11 +85,10 @@ class MiaoshouRuntime(object):
             if f"--{arg.strip()}" not in self.cmdline_args and arg.strip() != '':
                 self.logger.info(f'add arg: {arg.strip()}')
                 self.cmdline_args.append(f'--{arg.strip()}')
-                print('added', self.cmdline_args)
 
         #remove duplicates
         self.cmdline_args = list(dict.fromkeys(self.cmdline_args))
-        print('added dup',self.cmdline_args)
+        #print('added dup',self.cmdline_args)
 
     def remove_arg(self, args: str = "") -> None:
         arg_keywords = ['port', 'theme']
@@ -101,13 +100,11 @@ class MiaoshouRuntime(object):
                         self.cmdline_args.remove(cmdl)
                         break
             elif f'--{arg.strip()}' in self.cmdline_args and arg.strip() != '':
-                print(f"remove args:{arg.strip()}")
                 self.cmdline_args.remove(f'--{arg.strip()}')
-                print('removed', self.cmdline_args)
 
         # remove duplicates
         self.cmdline_args = list(dict.fromkeys(self.cmdline_args))
-        print('removed dup',self.cmdline_args)
+        #print('removed dup',self.cmdline_args)
 
     def get_final_args(self, gpu, theme, port, checkgroup, more_args) -> None:
         # remove duplicates
@@ -326,7 +323,6 @@ class MiaoshouRuntime(object):
         mname, ext = os.path.splitext(fname)
 
         dst = os.path.join(shared.models_path, 'Stable-diffusion', f'{mname}.jpg')
-        print(dst)
         cover.save(dst)
 
         my_models = self.get_local_models()
@@ -545,7 +541,7 @@ class MiaoshouRuntime(object):
     def update_cover_info(self, model, covers):
         soup = BeautifulSoup(covers[0])
         cover_url = soup.findAll('img')[0]['src'].replace('width=100', 'width=450')
-
+        print(cover_url)
         if self.model_set is None:
             self.logger.error("model_set is null")
             return []
@@ -562,16 +558,22 @@ class MiaoshouRuntime(object):
         for mv in m['modelVersions']:
             for img in mv['images']:
                 if img['url'] == cover_url:
-                    if img['meta'] is None or img['meta'] == '':
-                        break
+                    if img['meta'] is not None and img['meta'] != '':
+                        try:
+                            meta = img['meta']
+                            generation_info += f"{meta['prompt']}\n"
+                            if meta['negativePrompt'] is not None:
+                                generation_info += f"Negative prompt: {meta['negativePrompt']}\n"
+                            generation_info += f"Steps: {meta['steps']}, Sampler: {meta['sampler']}, "
+                            generation_info += f"CFG scale: {meta['cfgScale']}, Seed: {meta['seed']}, Size: {meta['Size']},"
+                            if meta['Model hash'] is not None:
+                                generation_info += f"Model hash: {meta['Model hash']}"
 
-                    meta = img['meta']
-                    generation_info += f"{meta['prompt']}\n"
-                    generation_info += f"Negative prompt: {meta['negativePrompt']}\n"
-                    generation_info += f"Steps: {meta['steps']}, Sampler: {meta['sampler']}, "
-                    generation_info += f"CFG scale: {meta['cfgScale']}, Seed: {meta['seed']}, Size: {meta['Size']},"
-                    generation_info += f"Model hash: {meta['Model hash']}"
+                        except Exception as e:
+                            self.logger.info(f"generation_info error:{str(e)}")
+                            pass
 
+                    print('a')
                     if not os.path.exists(self.prelude.cache_folder):
                         os.mkdir(self.prelude.cache_folder)
 
@@ -582,13 +584,15 @@ class MiaoshouRuntime(object):
 
                     break
 
+        print(fname)
         if fname is not None and not os.path.exists(fname):
             r = requests.get(cover_url, stream=True)
+            print(r)
             r.raw.decode_content = True
             with open(fname, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
 
-        return gr.Button.update(visible=True), gr.Text.update(value=generation_info), gr.Image.update(value=fname)
+        return gr.Button.update(visible=True), gr.Text.update(value=generation_info), gr.Image.update(value=fname, visible=True)
 
     def get_downloading_status(self):
         (_, _, desc) = self.downloader_manager.tasks_summary()
@@ -611,16 +615,16 @@ class MiaoshouRuntime(object):
                 if f['type'] == 'LORA':
                     cover_fname = os.path.join(model_path, 'Lora', cover_fname)
                     model_fname = os.path.join(model_path, 'Lora', model_fname)
-                elif f['format'] == 'VAE':
+                elif f['type'] == 'VAE':
                     cover_fname = os.path.join(model_path, 'VAE', cover_fname)
                     model_fname = os.path.join(model_path, 'VAE', model_fname)
-                elif f['format'] == 'TextualInversion':
+                elif f['type'] == 'TextualInversion':
                     cover_fname = os.path.join(script_path, 'embeddings', cover_fname)
                     model_fname = os.path.join(script_path, 'embeddings', model_fname)
-                elif f['format'] == 'Hypernetwork':
+                elif f['type'] == 'Hypernetwork':
                     cover_fname = os.path.join(model_path, 'hypernetworks', cover_fname)
                     model_fname = os.path.join(model_path, 'hypernetworks', model_fname)
-                elif f['format'] == 'Controlnet':
+                elif f['type'] == 'Controlnet':
                     cover_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', cover_fname)
                     model_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', model_fname)
                 else:
@@ -757,11 +761,9 @@ class MiaoshouRuntime(object):
                     data = file.readlines()
                     for line in data:
                         if 'webui.py' in line:
-                            print('b')
                             rep_txt = ' '.join(self.cmdline_args).replace('\\', '\\\\')
                             line = f"python\python.exe webui.py {rep_txt}\n"
                         new_data += line
-                        print(line)
                     file.seek(0)
                     file.write(new_data)
                     file.truncate()
