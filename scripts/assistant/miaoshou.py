@@ -23,6 +23,7 @@ class MiaoShouAssistant(object):
         self.prelude = MiaoshouPrelude()
         self.runtime = MiaoshouRuntime()
         self.refresh_symbol = '\U0001f504'
+        self.coffee_symbol = '\U0001f9cb' # 🧋
         self.folder_symbol = '\U0001f4c2'  # 📂
 
     def on_event_ui_tabs_opened(self) -> t.List[t.Optional[t.Tuple[t.Any, str, str]]]:
@@ -30,6 +31,7 @@ class MiaoShouAssistant(object):
             self.create_subtab_boot_assistant()
             self.create_subtab_model_management()
             self.create_subtab_model_download()
+            self.create_subtab_about()
 
         return [(miaoshou_assistant.queue(), "Miaoshou Assistant", "miaoshou_assistant")]
 
@@ -102,6 +104,8 @@ class MiaoShouAssistant(object):
                     def request_restart():
                         shared.state.interrupt()
                         shared.state.need_restart = True
+                        launch.prepare_environment()
+                        #launch.start()
 
                     restart_gradio.click(
                         request_restart,
@@ -119,11 +123,9 @@ class MiaoShouAssistant(object):
                     with gr.Row():
                         sys_info_refbtn = gr.Button(value="Refresh")
 
-        def update_chkbox(chkbox):
-            print(chkbox)
+
 
         self.drp_gpu.change(self.runtime.update_xformers, inputs=[self.drp_gpu, self.chk_group_args], outputs=[self.chk_group_args])
-        self.chk_group_args.change(update_chkbox, inputs=[self.chk_group_args], outputs=[])
         sys_info_refbtn.click(self.prelude.get_sys_info, None, txt_sys_info)
 
 
@@ -289,6 +291,28 @@ class MiaoShouAssistant(object):
                                      inputs=[model_source_dropdown],
                                      outputs=[self.runtime.ds_models, self.runtime.ds_my_models, dwn_button, open_url_in_browser_newtab_button])
 
+    def create_subtab_about(self) -> None:
+        with gr.TabItem('About', elem_id="about_tab") as tab_about:
+            with gr.Row():
+                gr.HTML(
+                    f"""
+                    <div><p>
+                    This extension is created to improve some of the use experience for automatic1111 webui.</br>
+                    It is free of charge, use it as you wish, please DO NOT sell this extension.</br>
+                    Follow us on github, discord and give us suggestions, report bugs. support us with love or coffee~</br></br>
+                    Cheers~</p>
+                    <p style="text-align: left;">
+                        <a target="_blank" href="https://github.com/miaoshouai/miaoshouai-assistant"><img src="https://img.shields.io/github/followers/miaoshouai?style=social" style="display: inline;" alt="MiaoshouAI GitHub"/></a>
+                        <a href="https://discord.gg/S22Jgn3rtz"><img src="https://img.shields.io/discord/1086407792451129374?label=Discord" style="display: inline;" alt="Discord server"></a>|
+                        <a target="_blank" href='https://www.buymeacoffee.com/miaoshou'>【buy me coffee~ \U0001f9cb】</a>|
+                        <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=p5ZhOHAh">【QQ群：256734228】</a>|
+                        <a target="_blank" href='https://t.zsxq.com/0d6EqTqDN'>【加入异能AI研究所-知识星球】</a>|
+                        <a target="_blank" href='https://docs.qq.com/doc/DY0pVZWJUWWRHa0tM'>【其它你可能用得到的】</a>
+                    </p>
+
+                    """
+                )
+
     def save_cmdline_args(self, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
         #print(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
         self.runtime.get_final_args(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
@@ -304,7 +328,6 @@ class MiaoShouAssistant(object):
             sys.argv.append(arg)
 
         print('saved args', sys.argv)
-        launch.prepare_environment()
         #launch.start()
         return gr.Markdown.update(value="Settings Saved", visible=True)
 
