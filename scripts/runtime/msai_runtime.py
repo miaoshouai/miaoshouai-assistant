@@ -542,7 +542,7 @@ class MiaoshouRuntime(object):
     def update_cover_info(self, model, covers):
         soup = BeautifulSoup(covers[0])
         cover_url = soup.findAll('img')[0]['src'].replace('width=100', 'width=450')
-        print(cover_url)
+
         if self.model_set is None:
             self.logger.error("model_set is null")
             return []
@@ -574,7 +574,6 @@ class MiaoshouRuntime(object):
                             self.logger.info(f"generation_info error:{str(e)}")
                             pass
 
-                    print('a')
                     if not os.path.exists(self.prelude.cache_folder):
                         os.mkdir(self.prelude.cache_folder)
 
