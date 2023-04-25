@@ -23,7 +23,7 @@ class MiaoshouFileDownloader(object):
                  local_file: str = None, local_directory: str = None, estimated_total_length: float = 0.,
                  expected_checksum: str = None,
                  channel: queue.Queue = None,
-                 max_retries=3) -> None:
+                 max_retries=5) -> None:
         self.logger = Logger()
 
         self.target_url: str = target_url
