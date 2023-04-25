@@ -5,8 +5,10 @@ import platform
 import re
 import shutil
 import sys
+import io
 import time
 import typing as t
+import gzip
 
 import gradio as gr
 import requests
@@ -14,6 +16,7 @@ from bs4 import BeautifulSoup
 import subprocess
 from subprocess import check_output
 import modules
+
 #import tkinter as tk
 #from tkinter import filedialog, ttk
 from modules import shared
@@ -584,10 +587,8 @@ class MiaoshouRuntime(object):
 
                     break
 
-        print(fname)
         if fname is not None and not os.path.exists(fname):
             r = requests.get(cover_url, stream=True)
-            print(r)
             r.raw.decode_content = True
             with open(fname, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
@@ -675,6 +676,20 @@ class MiaoshouRuntime(object):
 
         #self.model_files.clear()
         return gr.HTML.update(value=f"<h4>{len(urls)} downloading tasks added into task list</h4>")
+
+    def install_preset_models_if_needed(self):
+        assets_folder = os.path.join(self.prelude.ext_folder, "assets")
+        configs_folder = os.path.join(self.prelude.ext_folder, "configs")
+
+        for model_filename in ["civitai_models.json", "liandange_models.json"]:
+            gzip_file = os.path.join(assets_folder, f"{model_filename}.gz")
+            target_file = os.path.join(configs_folder, f"{model_filename}")
+            if not os.path.exists(target_file):
+                with gzip.open(gzip_file, "rb") as compressed_file:
+                    with io.TextIOWrapper(compressed_file, encoding="utf-8") as decoder:
+                        content = decoder.read()
+                        with open(target_file, "w") as model_file:
+                            model_file.write(content)
 
     def get_dir_and_file(self, file_path):
         dir_path, file_name = os.path.split(file_path)
@@ -777,6 +792,7 @@ class MiaoshouRuntime(object):
     @property
     def model_set(self) -> t.List[t.Dict]:
         try:
+            self.install_preset_models_if_needed()
             self.logger.info(f"access to model info for '{self.model_source}'")
             model_json_mtime = toolkit.get_file_last_modified_time(self.prelude.model_json[self.model_source])
 
@@ -790,6 +806,7 @@ class MiaoshouRuntime(object):
             self._model_set_last_access_time = datetime.datetime.now()
 
         return self._model_set
+
 
     @property
     def allow_nsfw(self) -> bool:
