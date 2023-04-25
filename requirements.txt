@@ -1,4 +1,3 @@
 psutil
 rehash
 tqdm
-tk==0.1.0

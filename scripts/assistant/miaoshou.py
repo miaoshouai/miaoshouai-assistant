@@ -138,9 +138,8 @@ class MiaoShouAssistant(object):
                                           "Your default models directory needs to be removed first before you apply. Make sure do your backups!")
                         md_result = gr.Markdown(visible=False, value="")
                     with gr.Row():
-                        model_folder_path = gr.Textbox("", label="Model path", interactive=False)
-                        open_folder_button = ToolButton(value=self.folder_symbol,
-                                                        elem_id="hidden_element" if shared.cmd_opts.hide_ui_dir_config else "open_folder_metadata_editor")
+                        model_folder_path = gr.Textbox("", label="Model path", placeholder="Copy & paste your model destination folder here", interactive=True)
+                        #open_folder_button = ToolButton(value=self.folder_symbol, elem_id="hidden_element" if shared.cmd_opts.hide_ui_dir_config else "open_folder_metadata_editor")
                         refresh_models_button = ToolButton(value=self.refresh_symbol, elem_id="hidden_element")
                     with gr.Row():
                         btn_connect_modeldir = gr.Button(value="Apply Virtual Model Folder")
@@ -187,7 +186,7 @@ class MiaoShouAssistant(object):
                             ))
 
         btn_set_cover.click(self.runtime.set_cover, inputs=[self.runtime.ds_my_models, c_image], outputs=[self.runtime.ds_my_models])
-        open_folder_button.click(self.runtime.open_folder, inputs=[model_folder_path], outputs=[model_folder_path])
+        #open_folder_button.click(self.runtime.open_folder, inputs=[model_folder_path], outputs=[model_folder_path])
         btn_connect_modeldir.click(self.runtime.change_model_folder, inputs=[model_folder_path], outputs=[md_result])
         refresh_models_button.click(self.runtime.refresh_local_models, inputs=[], outputs=[self.runtime.ds_my_models])
 
