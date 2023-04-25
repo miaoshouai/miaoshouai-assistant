@@ -1,3 +1,4 @@
 psutil
 rehash
 tqdm
+tkinter
