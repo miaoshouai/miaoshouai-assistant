@@ -1,4 +1,4 @@
 psutil
 rehash
 tqdm
-tkinter
+tk==0.1.0
