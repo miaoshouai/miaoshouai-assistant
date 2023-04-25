@@ -71,7 +71,7 @@ class DownloadingEntry(object):
         self._downloading = True
 
     def update_final_status(self, result: bool) -> None:
-        self._failure = result
+        self._failure = (result is False)
         self._downloading = False
 
     def is_failure(self) -> bool:
