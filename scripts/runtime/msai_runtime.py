@@ -626,8 +626,8 @@ class MiaoshouRuntime(object):
                     cover_fname = os.path.join(model_path, 'hypernetworks', cover_fname)
                     model_fname = os.path.join(model_path, 'hypernetworks', model_fname)
                 elif f['type'] == 'Controlnet':
-                    cover_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', cover_fname)
-                    model_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', model_fname)
+                    cover_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', 'models', cover_fname)
+                    model_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', 'models', model_fname)
                 else:
                     cover_fname = os.path.join(model_path, 'Stable-diffusion', cover_fname)
                     model_fname = os.path.join(model_path, 'Stable-diffusion', model_fname)
