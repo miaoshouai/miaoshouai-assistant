@@ -1,7 +1,7 @@
 {
     "boot_settings": {
-        "drp_args_vram": "Med: 6-8G VRAM",
-        "drp_args_theme": "Auto",
+        "drp_args_vram": "CPU Only",
+        "drp_args_theme": "Dark Mode",
         "txt_args_listen_port": "7860",
         "Enable xFormers": "--xformers",
         "No Half": "--no-half",
@@ -9,8 +9,8 @@
         "Enable API": "--api",
         "Auto Launch": "--autolaunch",
         "Allow Local Network Access": "False",
-        "drp_choose_version": "Official Release",
-        "txt_args_more": "",
+        "drp_choose_version": "Python Integrated",
+        "txt_args_more": "--theme dark",
         "disable_log_console_output": true
     }
 }
