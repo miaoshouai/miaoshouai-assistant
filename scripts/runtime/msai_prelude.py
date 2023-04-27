@@ -68,8 +68,8 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
 
         self._theme_setting = {
             'Auto': '',
-            'Light Mode': '--theme=light',
-            'Dark Mode': '--theme=dark',
+            'Light Mode': '--theme light',
+            'Dark Mode': '--theme dark',
         }
         self._ENV_EXCLUSION = ['COLAB_GPU', 'RUNPOD_POD_ID']
 
