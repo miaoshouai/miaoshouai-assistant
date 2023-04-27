@@ -63,7 +63,6 @@ class MiaoshouRuntime(object):
         for arg in commandline_args:
             if 'theme' in arg:
                 arg = arg.replace(' ', '=') # fix calls from booters with different arg formats
-                print(arg)
                 theme = [k for k, v in self.prelude.theme_setting.items() if v == arg][0]
             if 'port' in arg:
                 port = arg.split(' ')[-1]
