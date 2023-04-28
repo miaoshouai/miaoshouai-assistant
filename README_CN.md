@@ -14,6 +14,7 @@ https://github.com/miaoshouai/miaoshouai-assistant.git
 
 ### 使用方法
 ##### 启动助手
+
 <p align="center">
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/boot_assistant_en.png"/>
 </p>
@@ -24,6 +25,7 @@ GPU 优化、UI 主题、启用端口监听、xformers、自动启动等。
 - 允许您将所有设置保存到 webui-user.bat/其他启动脚本。
 
 ##### 模型管理
+
 <p align="center">
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_manager.gif"/>
 </p>
@@ -32,11 +34,13 @@ GPU 优化、UI 主题、启用端口监听、xformers、自动启动等。
 您可以非常容易的将 civitai 提示词发送到 txt2img/img2img/inpainting/extra
 
 ##### 模型下载器
+
 <p align="center">
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_downloader.gif"/>
 </p>
 
 - 允许您从 civitai.com 或 liandange.com 搜索和下载模型，找到您想要的模型类型
+
 <p align="center">
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/controlnet_download.gif"/>
 </p>

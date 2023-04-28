@@ -27,6 +27,7 @@ GPU optimization, UI Theme, enable port listening, xformers, auto launch, etc.
 - Allows you to save all your settings to your webui-user.bat/other boot script for your webui.
 
 ##### Model Management
+
 <p align="center">
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_manager.gif"/>
 </p>
@@ -35,11 +36,13 @@ GPU optimization, UI Theme, enable port listening, xformers, auto launch, etc.
 You can easily send these civitai prompts to txt2img/img2img/inpainting/extra
 
 ##### Model Downloader
+
 <p align="center">
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_downloader.gif"/>
 </p>
 
 - Allows you to search and download models from civitai.com or liandange.com, find the model type you want
+
 <p align="center">
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/controlnet_download.gif"/>
 </p>
