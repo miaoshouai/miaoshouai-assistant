@@ -29,7 +29,7 @@ GPU optimization, UI Theme, enable port listening, xformers, auto launch, etc.
 ##### Model Management
 
 <p align="center">
-   <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_manager.gif"/>
+   <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_manager_en.png"/>
 </p>
 
 - Allows you to view all your models and view the model civitai prompts and parameters from the covers.
