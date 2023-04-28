@@ -27,7 +27,7 @@ GPU 优化、UI 主题、启用端口监听、xformers、自动启动等。
 ##### 模型管理
 
 <p align="center">
-   <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_manager.gif"/>
+   <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_manager.png"/>
 </p>
 
 - 允许您查看所有模型，并从封面查看模型 civitai 提示和参数。
