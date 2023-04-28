@@ -15,5 +15,6 @@ flagged/
 
 configs/civitai_models.json
 configs/liandange_models.json
+configs/model_hash.json
 covers/*
 cache/*
