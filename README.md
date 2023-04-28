@@ -18,7 +18,7 @@ Click `Install`, wait until it's done. Go to `Settings`-> `Reload UI`
 ##### Boot Assistant
 
 <p align="center">
-   <img src="https://msdn.miaoshouai.com/msai/kt/ez/boot-assistant_en.jpg"/>
+   <img src="https://msdn.miaoshouai.com/msai/kt/ez/boot_assistant_en.png"/>
 </p>
 
 - Allows you to change your webui boot settings including:
@@ -28,7 +28,7 @@ GPU optimization, UI Theme, enable port listening, xformers, auto launch, etc.
 
 ##### Model Management
 <p align="center">
-   <img src="https://msdn.miaoshouai.com/msai/kt/ez/model-management_en.jpg"/>
+   <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_manager_en.png"/>
 </p>
 
 - Allows you to view all your models and view the model civitai prompts and parameters from the covers.
@@ -36,12 +36,12 @@ You can easily send these civitai prompts to txt2img/img2img/inpainting/extra
 
 ##### Model Downloader
 <p align="center">
-   <img src="https://msdn.miaoshouai.com/msai/kt/ez/model%20downloader_en.jpg"/>
+   <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_downloader.gif"/>
 </p>
 
 - Allows you to search and download models from civitai.com or liandange.com, find the model type you want
 <p align="center">
-   <img src="https://msdn.miaoshouai.com/msai/kt/ez/vae-downloader_en.jpg"/>
+   <img src="https://msdn.miaoshouai.com/msai/kt/ez/controlnet_download.gif"/>
 </p>
 
 - It also allows you to find 1.5, 2.1 official models, controlnet models or different vae models.
