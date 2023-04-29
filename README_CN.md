@@ -1,6 +1,8 @@
 # 喵手助理
 [English](README.md) / [中文](README_CN.md)
 
+1.1 版更新: 模型管理下增加了对Lora, embedding and hypernetwork等模型的支持。修复了启动时与秋叶启动器的冲突。
+
 喵手助理 [Automatic1111 WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
 ### 安装
