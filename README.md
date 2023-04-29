@@ -4,6 +4,8 @@
 
 MiaoshouAI Assistant for [Automatic1111 WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
+1.1 Release: add support for Lora, embedding and hypernetwork models under model manangement. bug fixes.
+
 ### Installation
 In Automatic1111 WebUI, go to `Extensions Tab`->`Install from URL`, copy the following address in "**URL for extension's git repository**".
 
