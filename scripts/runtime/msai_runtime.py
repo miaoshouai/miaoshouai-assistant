@@ -19,7 +19,7 @@ import modules
 
 #import tkinter as tk
 #from tkinter import filedialog, ttk
-from modules import shared
+from modules import shared, sd_hijack
 from modules.sd_models import CheckpointInfo
 from scripts.download.msai_downloader_manager import MiaoshouDownloaderManager
 from scripts.logging.msai_logger import Logger
@@ -34,12 +34,17 @@ class MiaoshouRuntime(object):
         self.prelude = MiaoshouPrelude()
         self._old_additional: str = None
         self._model_set: t.List[t.Dict] = None
+        self._my_model_set: t.List[t.Dict] = None
+        self._active_model_set: str = None
         self._model_set_last_access_time: datetime.datetime = None
+        self._my_model_set_last_access_time: datetime.datetime = None
         self._ds_models: gr.Dataset = None
         self._ds_my_models: gr.Dataset = None
         self._ds_my_model_covers: gr.Dataset = None
         self._allow_nsfw: bool = False
         self._model_source: str = "civitai.com"  # civitai is the default model source
+        self._my_model_source: str = "civitai.com"
+        self._git_address: str = "https://github.com/miaoshouai/miaoshouai-assistant.git"
 
         # TODO: may be owned by downloader class
         self.model_files = []
@@ -49,7 +54,9 @@ class MiaoshouRuntime(object):
     def get_default_args(self, commandline_args: t.List[str] = None):
         if commandline_args is None:
             commandline_args: t.List[str] = toolkit.get_args(sys.argv[1:])
+        commandline_args = list(map(lambda x: x.replace('theme=', 'theme '), commandline_args))
         self.cmdline_args = list(dict.fromkeys(commandline_args))
+
         self.logger.info(f"default commandline args: {commandline_args}")
 
         checkbox_values = []
@@ -271,6 +278,14 @@ class MiaoshouRuntime(object):
 
         toolkit.write_json(self.prelude.setting_file, all_settings)
 
+    def update_boot_setting(self, setting, value):
+        boot_settings = self.prelude.boot_settings
+        boot_settings[setting] = value
+
+        all_settings = self.prelude.all_settings
+        all_settings['boot_settings'] = boot_settings
+        toolkit.write_json(self.prelude.setting_file, all_settings)
+
     def get_all_models(self, site: str) -> t.Any:
         return toolkit.read_json(self.prelude.model_json[site])
 
@@ -281,7 +296,7 @@ class MiaoshouRuntime(object):
         model_hashes = toolkit.read_json(self.prelude.model_hash_file)
 
         if len(model_hashes) == 0 or chk_point.title not in model_hashes.keys():
-            chk_point.shorthash = chk_point.calculate_shorthash()
+            chk_point.shorthash = self.calculate_shorthash(chk_point)
             model_hashes[chk_point.title] = chk_point.shorthash
             toolkit.write_json(self.prelude.model_hash_file, model_hashes)
         else:
@@ -289,54 +304,73 @@ class MiaoshouRuntime(object):
 
         return chk_point
 
-    def get_local_models(self) -> t.List[t.Any]:
+    def calculate_shorthash(self, chk_point: CheckpointInfo):
+        if chk_point.sha256 is None:
+            return
+        else:
+            return chk_point.sha256[0:10]
+
+
+    def update_my_model_type(self, model_type) -> t.Dict:
+        my_models = self.get_local_models(model_type)
+        self.ds_my_models.samples = my_models
+
+        return gr.Dataset.update(samples=my_models)
+
+    def get_local_models(self, model_type) -> t.List[t.Any]:
         models = []
 
-        for file in modules.sd_models.checkpoint_tiles():
-            chkpt_info = modules.sd_models.get_closet_checkpoint_match(file)
-            if chkpt_info.sha256 is None and chkpt_info.shorthash is None:
-                chkpt_info = self.get_hash_from_json(chkpt_info)
+        for root, dirs, files in os.walk(self.prelude.model_type[model_type]):
+            for file in files:
+                mpath = os.path.join(root, file)
+                fname, ext = os.path.splitext(file)
+                if ext in ['.ckpt', '.safetensors', '.pt'] and file != 'scaler.pt':
+                    chkpt_info = modules.sd_models.get_closet_checkpoint_match(file)
+                    if chkpt_info is None:
+                        chkpt_info = CheckpointInfo(os.path.join(root, file))
 
-            model_info = self.search_model_by_hash(chkpt_info)
-            fname = re.sub(r'\[.*?\]', "", chkpt_info.title)
+                    if chkpt_info.sha256 is None and chkpt_info.shorthash is None:
+                        chkpt_info = self.get_hash_from_json(chkpt_info)
 
-            if model_info is not None:
-                models.append(model_info)
-            else:
-                self.logger.info(
-                    f"{chkpt_info.title}, {chkpt_info.hash}, {chkpt_info.shorthash}, {chkpt_info.sha256}")
-                models.append([
-                    self.prelude.no_preview_img,
-                    0,
-                    [os.path.basename(fname)],
-                    [fname],
-                    [chkpt_info.shorthash],
-                    [], [], []])
+                    model_info = self.search_model_info(chkpt_info, mpath, model_type)
+                    fname = re.sub(r'\[.*?\]', "", chkpt_info.title)
+
+                    if model_info is not None:
+                        models.append(model_info)
+                    else:
+                        self.logger.info(
+                            f"{chkpt_info.title}, {chkpt_info.hash}, {chkpt_info.shorthash}, {chkpt_info.sha256}")
+                        models.append([
+                            self.prelude.no_preview_img,
+                            0,
+                            [os.path.basename(fname)],
+                            [str(file).replace(self.prelude.model_type[model_type]+'\\', '')]])
 
         return models
 
 
-    def refresh_local_models(self) -> t.Dict:
-        my_models = self.get_local_models()
+    def refresh_local_models(self, model_type) -> t.Dict:
+        my_models = self.get_local_models(model_type)
         self.ds_my_models.samples = my_models
 
         return gr.Dataset.update(samples=my_models)
 
-    def set_cover(self, model, cover):
+    def set_cover(self, model, cover, model_type):
         fname = model[3][0]
         mname, ext = os.path.splitext(fname)
+        mfolder = self.prelude.model_type[model_type]
 
-        dst = os.path.join(shared.models_path, 'Stable-diffusion', f'{mname}.jpg')
+        dst = os.path.join(mfolder, f'{mname}.jpg')
         cover.save(dst)
 
-        my_models = self.get_local_models()
+        my_models = self.get_local_models(model_type)
         self.ds_my_models.samples = my_models
 
         return gr.Dataset.update(samples=my_models)
 
 
 
-    def search_model_by_hash(self, chkpt_info) -> t.Optional[t.List[t.Any]]:
+    def search_model_info(self, chkpt_info: CheckpointInfo, mpath: str, model_type: str) -> t.Optional[t.List[t.Any]]:
 
         lookup_sha256 = chkpt_info.sha256
         lookup_shash = chkpt_info.shorthash
@@ -345,17 +379,17 @@ class MiaoshouRuntime(object):
         self.logger.info(f"lookup_sha256: {lookup_sha256}, lookup_shash: {lookup_shash}, fname: {fname}")
 
         res = None
-        if lookup_sha256 is None and lookup_shash is None:
+        if lookup_sha256 is None and lookup_shash is None and fname is None:
             return None
 
-        mpath = (os.path.join(shared.models_path, chkpt_info.filename))
         prefix, ext = os.path.splitext(mpath)
+
         if os.path.exists(f'{prefix}.jpg'):
-            cover_img = os.path.join(shared.models_path, 'Stable-diffusion', f'{os.path.basename(prefix)}.jpg')
+            cover_img = os.path.join(os.path.dirname(mpath), f'{os.path.basename(prefix)}.jpg')
         elif os.path.exists(f'{prefix}.png'):
-            cover_img = os.path.join(shared.models_path, 'Stable-diffusion', f'{os.path.basename(prefix)}.png')
+            cover_img = os.path.join(os.path.dirname(mpath), f'{os.path.basename(prefix)}.png')
         elif os.path.exists(f'{prefix}.webp'):
-            cover_img = os.path.join(shared.models_path, 'Stable-diffusion', f'{os.path.basename(prefix)}.webp')
+            cover_img = os.path.join(os.path.dirname(mpath), f'{os.path.basename(prefix)}.webp')
         else:
             cover_img = self.prelude.no_preview_img
 
@@ -363,18 +397,25 @@ class MiaoshouRuntime(object):
             os.mkdir(self.prelude.cover_folder)
 
         dst = os.path.join(self.prelude.cover_folder, os.path.basename(cover_img))
-        if cover_img != self.prelude.no_preview_img and not os.path.exists(dst):
+        if cover_img != self.prelude.no_preview_img and os.path.exists(cover_img) and os.path.exists(dst):
+            dst_size = os.stat(dst).st_size
+            cover_size = os.stat(cover_img).st_size
+            if dst_size != cover_size:
+                print('update to new cover')
+                shutil.copyfile(cover_img, dst)
+        elif cover_img != self.prelude.no_preview_img and os.path.exists(cover_img) and not os.path.exists(dst):
             shutil.copyfile(cover_img, dst)
         elif cover_img == self.prelude.no_preview_img:
             dst = cover_img
 
-
-        for model in self.model_set:
+        for model in self.my_model_set:
             match = False
 
             for ver in model['modelVersions']:
                 for file in ver['files']:
-                    if lookup_sha256 is not None and 'SHA256' in file['hashes'].keys():
+                    if fname == file['name']:
+                        match = True
+                    elif lookup_sha256 is not None and 'SHA256' in file['hashes'].keys():
                         match = (lookup_sha256.upper() == file['hashes']['SHA256'].upper())
                     elif lookup_shash is not None:
                         match = (lookup_shash[:10].upper() in [h.upper() for h in file['hashes'].values()])
@@ -386,12 +427,7 @@ class MiaoshouRuntime(object):
                             dst,
                             mid,
                             [f"{model['name']}/{ver['name']}"],
-                            [fname],
-                            [lookup_shash],
-                            [model['creator']['username']],
-                            [model['type']],
-                            [model['nsfw']],
-                            [ver['trainedWords']],
+                            [mpath.replace(self.prelude.model_type[model_type]+'\\', '')]
                         ]
 
             if match:
@@ -429,18 +465,20 @@ class MiaoshouRuntime(object):
     def get_model_info(self, models) -> t.Tuple[t.List[t.List[str]], t.Dict, str, t.Dict]:
         drop_list = []
         cover_imgs = []
-        htmlDetail = "<div><p>Empty</p></div>"
-
+        htmlDetail = "<div><p>No info found</p></div>"
 
         mid = models[1]
 
         # TODO: use map to enhance the performances
-        m_list = [e for e in self.model_set if e['id'] == mid]
+        if self.active_model_set == 'model_set':
+            m_list = [e for e in self.model_set if e['id'] == mid]
+        else:
+            m_list = [e for e in self.my_model_set if e['id'] == mid]
 
-        if m_list is not None or m_list != []:
+        if m_list is not None and len(m_list) > 0:
             m = m_list[0]
         else:
-            return [[]], {}, '', {}
+            return [[]], {}, htmlDetail, {}
 
         self.model_files.clear()
 
@@ -505,12 +543,12 @@ class MiaoshouRuntime(object):
             if m.get('tags') and isinstance(m.get('tags'), list):
                 htmlDetail += f"<tr><td>Tags:</td><td>"
                 for t in m['tags']:
-                    htmlDetail += f"<span>{t}</span>"
+                    htmlDetail += f'<span style="margin-right:5px>{t}</span>'
                 htmlDetail += "</td></tr>"
             if latest_version.get('trainedWords'):
                 htmlDetail += f"<tr><td>Trigger Words:</td><td>"
                 for t in latest_version['trainedWords']:
-                    htmlDetail += f"<span>{t}</span>"
+                    htmlDetail += f'<span style="margin-right:5px;">{t}</span>'
                 htmlDetail += "</td></tr>"
             htmlDetail += "</tbody></table></div>"
             htmlDetail += f"<div>{m['description'] if m.get('description') else 'N/A'}</div>"
@@ -525,33 +563,40 @@ class MiaoshouRuntime(object):
         )
 
     def get_my_model_covers(self, model):
-        img_list, l1, h1, h2 = self.get_model_info(model)
+        img_list, l1, htmlDetail, h2 = self.get_model_info(model)
         if self._ds_my_model_covers is None:
             self.logger.error(f"_ds_my_model_covers is not initialized")
             return {}
+
+        new_html = '<div></div>'
+        if htmlDetail is not None:
+            new_html = htmlDetail.split('</tbody></table></div>')[0] + '</tbody></table></div>'
 
         cover_list = []
         for img_link in img_list:
             cover_html = '<div style="display: flex; align-items: center;">\n'
             cover_html += f'<div style = "margin-right: 10px;" class ="model-item" >\n'
-            cover_html += f'<img src="{img_link[0].replace("width=450","width=100")}" style="width:100px;">\n</div>\n'
-            cover_html += '</div>'
+            if len(img_link) > 0:
+                cover_html += f'<img src="{img_link[0].replace("width=450","width=100")}" style="width:100px;">\n'
+
+            cover_html += '</div>\n</div>'
             cover_list.append([cover_html])
 
         self._ds_my_model_covers.samples = cover_list
-        return self._ds_my_model_covers.update(samples=cover_list)
+        return self._ds_my_model_covers.update(samples=cover_list), gr.HTML.update(visible=True, value=new_html)
 
 
     def update_cover_info(self, model, covers):
+
         soup = BeautifulSoup(covers[0])
         cover_url = soup.findAll('img')[0]['src'].replace('width=100', 'width=450')
 
-        if self.model_set is None:
+        if self.my_model_set is None:
             self.logger.error("model_set is null")
             return []
 
         mid = model[1]
-        m_list = [e for e in self.model_set if e['id'] == mid]
+        m_list = [e for e in self.my_model_set if e['id'] == mid]
         if m_list is not None or m_list != []:
             m = m_list[0]
         else:
@@ -580,14 +625,16 @@ class MiaoshouRuntime(object):
                     if not os.path.exists(self.prelude.cache_folder):
                         os.mkdir(self.prelude.cache_folder)
 
-                    if self.model_source == 'civitai.com':
+                    if self.my_model_source == 'civitai.com':
                         fname = os.path.join(self.prelude.cache_folder, f"{cover_url.split('/')[-1]}.jpg")
-                    elif self.model_source == 'liandange.com':
+                    elif self.my_model_source == 'liandange.com':
                         fname = os.path.join(self.prelude.cache_folder, cover_url.split('?')[0].split('/')[-1])
 
                     break
 
         if fname is not None and not os.path.exists(fname):
+            if self.my_model_source == 'liandange.com':
+                cover_url = soup.findAll('img')[0]['src'].replace('/w/100', '/w/450')
             r = requests.get(cover_url, stream=True)
             r.raw.decode_content = True
             with open(fname, 'wb') as f:
@@ -789,6 +836,18 @@ class MiaoshouRuntime(object):
         self.update_boot_settings(version, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
         return gr.update(value=msg, visible=True)
 
+    def update_program(self):
+        result = "Update successful, restart to take effective."
+        try:
+            process = subprocess.Popen(["git", "pull"], stdout=subprocess.PIPE)
+            result = process.communicate()[0]
+            self.install_preset_models_if_needed()
+        except Exception as e:
+            result = str(e)
+
+        return gr.Markdown.update(value=result)
+
+
     @property
     def model_set(self) -> t.List[t.Dict]:
         try:
@@ -806,6 +865,24 @@ class MiaoshouRuntime(object):
             self._model_set_last_access_time = datetime.datetime.now()
 
         return self._model_set
+
+    @property
+    def my_model_set(self) -> t.List[t.Dict]:
+        try:
+            self.install_preset_models_if_needed()
+            self.logger.info(f"access to model info for '{self.my_model_source}'")
+            model_json_mtime = toolkit.get_file_last_modified_time(self.prelude.model_json[self.my_model_source])
+
+            if self._my_model_set is None or self._my_model_set_last_access_time is None \
+                or self._my_model_set_last_access_time < model_json_mtime:
+                self._my_model_set = self.get_all_models(self.my_model_source)
+                self._my_model_set_last_access_time = model_json_mtime
+                self.logger.info(f"load '{self.my_model_source}' model data from local file")
+        except Exception as e:
+            self._my_model_set = self.fetch_all_models()
+            self._my_model_set_last_access_time = datetime.datetime.now()
+
+        return self._my_model_set
 
 
     @property
@@ -849,6 +926,29 @@ class MiaoshouRuntime(object):
         self.logger.info(f"model source changes from {self.model_source} to {newone}")
         self._model_source = newone
         self._model_set_last_access_time = None  # reset timestamp
+
+    @property
+    def my_model_source(self) -> str:
+        return self._my_model_source
+
+    @my_model_source.setter
+    def my_model_source(self, newone: str):
+        self.logger.info(f"model source changes from {self.my_model_source} to {newone}")
+        self._my_model_source = newone
+        self._my_model_set_last_access_time = None  # reset timestamp
+
+    @property
+    def active_model_set(self) -> str:
+        return self._active_model_set
+
+    @active_model_set.setter
+    def active_model_set(self, newone: str):
+        self.logger.info(f"model set changes from {self.active_model_set} to {newone}")
+        self._active_model_set = newone
+
+    @property
+    def git_address(self) -> str:
+        return self._git_address
 
     def introception(self) -> None:
         (gpu, theme, port, checkbox_values, extra_args, ver) = self.get_default_args()
