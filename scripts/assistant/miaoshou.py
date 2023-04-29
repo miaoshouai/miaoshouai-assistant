@@ -31,7 +31,7 @@ class MiaoShouAssistant(object):
             self.create_subtab_boot_assistant()
             self.create_subtab_model_management()
             self.create_subtab_model_download()
-            self.create_subtab_about()
+            self.create_subtab_update()
 
         return [(miaoshou_assistant.queue(), "Miaoshou Assistant", "miaoshou_assistant")]
 
@@ -130,7 +130,7 @@ class MiaoShouAssistant(object):
 
 
     def create_subtab_model_management(self) -> None:
-        with gr.TabItem('Model Management', elem_id="model_management_tab") as tab_batch:
+        with gr.TabItem('Model Management', elem_id="model_management_tab") as tab_model_manager:
             with gr.Row():
                 with gr.Column():
                     with gr.Row():
@@ -145,15 +145,26 @@ class MiaoShouAssistant(object):
                         btn_connect_modeldir = gr.Button(value="Apply Virtual Model Folder")
 
                     with gr.Row():
-                        my_models = self.runtime.get_local_models()
+                        my_model_source_dropdown = gr.Dropdown(
+                            choices=["civitai.com", "liandange.com"],
+                            value=self.runtime.my_model_source,
+                            label="Select Model Source",
+                            type="value",
+                            show_label=True,
+                            elem_id="my_model_source").style(full_width=False)
+
+                        mtypes = list(self.prelude.model_type.keys())
+                        my_model_type = gr.Radio(mtypes,
+                                              show_label=False, value='Checkpoint', elem_id="my_model_type",
+                                              interactive=True).style(full_width=True)
+
+                    with gr.Row():
+                        my_models = self.runtime.get_local_models(my_model_type.value)
                         self.runtime.ds_my_models = gr.Dataset(
                             components=[gr.Image(visible=False, label='Cover', elem_id='my_model_cover'),
                                         gr.Textbox(visible=False, label='ModelId'),
                                         gr.Textbox(visible=False, label='Name/Version'),
-                                        gr.Textbox(visible=False, label='File Name'),
-                                        gr.Textbox(visible=False, label='Hash'), gr.Textbox(visible=False, label='Creator'),
-                                        gr.Textbox(visible=False, label='Type'), gr.Textbox(visible=False, label='NSFW'),
-                                        gr.Textbox(visible=False, label='Trigger Words', elem_id='my_model_trigger_words')],
+                                        gr.Textbox(visible=False, label='File Name')],
                             elem_id='my_model_lib',
                             label="My Models",
                             headers=None,
@@ -167,10 +178,11 @@ class MiaoShouAssistant(object):
                                                     samples=[],
                                                     samples_per_page=10)
                     with gr.Row(variant='panel'):
-                        btn_set_cover = gr.Button(visible=False, value='Set as Cover')
-                    with gr.Row(variant='panel'):
                         c_image = gr.Image(elem_id="pnginfo_image", label="Source", source="upload", interactive=True,
-                                         type="pil", visible=False)
+                                         type="pil", visible=True)
+
+                    with gr.Row(variant='panel'):
+                        btn_set_cover = gr.Button(visible=False, value='Set as Cover')
 
                     with gr.Row(variant='panel'):
                         generation_info = gr.Textbox(label='prompt', interactive=False, visible=True, elem_id="imginfo_generation_info")
@@ -185,18 +197,31 @@ class MiaoShouAssistant(object):
                                 source_image_component=c_image,
                             ))
 
-        btn_set_cover.click(self.runtime.set_cover, inputs=[self.runtime.ds_my_models, c_image], outputs=[self.runtime.ds_my_models])
+                    with gr.Row(variant='panel'):
+                        html_my_model = gr.HTML(visible=False)
+
+        btn_set_cover.click(self.runtime.set_cover, inputs=[self.runtime.ds_my_models, c_image, my_model_type], outputs=[self.runtime.ds_my_models])
         #open_folder_button.click(self.runtime.open_folder, inputs=[model_folder_path], outputs=[model_folder_path])
         btn_connect_modeldir.click(self.runtime.change_model_folder, inputs=[model_folder_path], outputs=[md_result])
-        refresh_models_button.click(self.runtime.refresh_local_models, inputs=[], outputs=[self.runtime.ds_my_models])
+        refresh_models_button.click(self.runtime.refresh_local_models, inputs=[my_model_type], outputs=[self.runtime.ds_my_models])
+        my_model_source_dropdown.change(self.switch_my_model_source,
+                                     inputs=[my_model_source_dropdown, my_model_type],
+                                     outputs=[self.runtime.ds_my_models])
+
+        my_model_type.change(self.runtime.update_my_model_type, inputs=[my_model_type], outputs=[self.runtime.ds_my_models])
 
         self.runtime.ds_my_models.click(self.runtime.get_my_model_covers,
                                      inputs=[self.runtime.ds_my_models],
-                                     outputs=[self.runtime.ds_my_model_covers])
+                                     outputs=[self.runtime.ds_my_model_covers, html_my_model])
 
         self.runtime.ds_my_model_covers.click(self.runtime.update_cover_info,
                                         inputs=[self.runtime.ds_my_models, self.runtime.ds_my_model_covers],
                                         outputs=[btn_set_cover, generation_info, c_image])
+
+        def tab_model_manager_select():
+            self.runtime.active_model_set = 'my_model_set'
+
+        tab_model_manager.select(tab_model_manager_select, inputs=[], outputs=[])
 
 
     def create_subtab_model_download(self) -> None:
@@ -224,7 +249,7 @@ class MiaoShouAssistant(object):
 
                     with gr.Row().style(equal_height=True):
                         nsfw_checker = gr.Checkbox(label='NSFW', value=False, elem_id="chk_nsfw", interactive=True)
-                        model_type = gr.Radio(["All", "Checkpoint", "LORA", "TextualInversion", "Hypernetwork"],
+                        model_type = gr.Radio(["All"] + list(self.prelude.model_type.keys()),
                                               show_label=False, value='All', elem_id="rad_model_type",
                                               interactive=True).style(full_width=True)
 
@@ -288,10 +313,23 @@ class MiaoShouAssistant(object):
 
         model_source_dropdown.change(self.switch_model_source,
                                      inputs=[model_source_dropdown],
-                                     outputs=[self.runtime.ds_models, self.runtime.ds_my_models, dwn_button, open_url_in_browser_newtab_button])
+                                     outputs=[self.runtime.ds_models, dwn_button, open_url_in_browser_newtab_button])
 
-    def create_subtab_about(self) -> None:
-        with gr.TabItem('About', elem_id="about_tab") as tab_about:
+        def tab_downloads_select():
+            self.runtime.active_model_set = 'model_set'
+
+        tab_downloads.select(tab_downloads_select, inputs=[], outputs=[])
+
+
+
+    def create_subtab_update(self) -> None:
+        with gr.TabItem('About', elem_id="about_update") as tab_update:
+            with gr.Row():
+                txt_update_result = gr.Markdown(visible=False)
+            #with gr.Row():
+                # btn_update = gr.Button(value="Update Miaoshouai Assistant & Model Source")
+            with gr.Row():
+                gr.Markdown(value="About")
             with gr.Row():
                 gr.HTML(
                     f"""
@@ -311,6 +349,8 @@ class MiaoShouAssistant(object):
 
                     """
                 )
+
+            #btn_update.click(self.runtime.update_program, inputs=[], outputs=[txt_update_result])
 
     def save_cmdline_args(self, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
         #print(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
@@ -335,15 +375,27 @@ class MiaoShouAssistant(object):
         show_download_button = self.runtime.model_source != "liandange.com"
         images = self.runtime.get_images_html()
         self.runtime.ds_models.samples = images
-        my_models = self.runtime.get_local_models()
-        self.runtime.ds_my_models.samples = my_models
+
+        if self.runtime.model_source not in ['official_models', 'controlnet']:
+            self.runtime.update_boot_setting('model_source', self.runtime.model_source)
 
         return (
             gr.Dataset.update(samples=images),
-            gr.Dataset.update(samples=my_models),
             gr.Button.update(visible=show_download_button),
             gr.HTML.update(visible=not show_download_button)
         )
 
+    def switch_my_model_source(self, new_model_source: str, model_type):
+        self.runtime.my_model_source = new_model_source
+        my_models = self.runtime.get_local_models(model_type)
+        self.runtime.ds_my_models.samples = my_models
+
+        if self.runtime.my_model_source not in ['official_models', 'controlnet']:
+            self.runtime.update_boot_setting('my_model_source', self.runtime.my_model_source)
+
+        return gr.Dataset.update(samples=my_models)
+
     def introception(self) -> None:
         self.runtime.introception()
+
+

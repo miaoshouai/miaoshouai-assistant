@@ -7,6 +7,7 @@ import psutil
 import torch
 
 import launch
+from modules import shared
 from scripts.logging.msai_logger import Logger
 from scripts.msai_utils import msai_toolkit as toolkit
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
@@ -72,6 +73,11 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
             'Dark Mode': '--theme dark',
         }
         self._ENV_EXCLUSION = ['COLAB_GPU', 'RUNPOD_POD_ID']
+        self._model_type = {'Checkpoint': f'{os.path.join(shared.models_path,"Stable-diffusion")}',
+                            'LORA': f'{os.path.join(shared.models_path,"Lora")}',
+                            "TextualInversion": f'{os.path.join(shared.script_path,"embeddings")}',
+                            "Hypernetwork": f'{os.path.join(shared.models_path,"hypernetworks")}'
+        }
 
     @property
     def ext_folder(self) -> str:
@@ -131,6 +137,10 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
     @property
     def theme_setting(self) -> t.Dict[str, str]:
         return self._theme_setting
+
+    @property
+    def model_type(self) -> t.Dict[str, str]:
+        return self._model_type
 
     @property
     def model_json(self) -> t.Dict[str, t.Any]:

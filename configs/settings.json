@@ -11,6 +11,8 @@
         "Allow Local Network Access": "False",
         "drp_choose_version": "Python Integrated",
         "txt_args_more": "--theme dark",
-        "disable_log_console_output": true
+        "disable_log_console_output": true,
+        "model_source": "liandange.com",
+        "my_model_source": "civitai.com"
     }
 }
