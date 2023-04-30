@@ -838,7 +838,7 @@ class MiaoshouRuntime(object):
     def check_update(self):
         update_status = 'latest'
         show_update = False
-        repo = git.Repo(self.path)
+        repo = git.Repo(self.prelude.ext_folder)
         for fetch in repo.remote().fetch(dry_run=True):
             if fetch.flags != fetch.HEAD_UPTODATE:
                 show_update = True
