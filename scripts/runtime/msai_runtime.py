@@ -845,7 +845,7 @@ class MiaoshouRuntime(object):
                 update_status = "behind"
                 break
 
-        return gr.Markdown(visible=True, value=update_status), gr.Button(visible=show_update)
+        return gr.Markdown.update(visible=True, value=update_status), gr.Button.update(visible=show_update)
 
     def update_program(self):
         result = "Update successful, restart to take effective."
@@ -859,7 +859,7 @@ class MiaoshouRuntime(object):
         except Exception as e:
             result = str(e)
 
-        return gr.Markdown.update(value=result)
+        return gr.Markdown.update(visible=True, value=result)
 
 
     @property
