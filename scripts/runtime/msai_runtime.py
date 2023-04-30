@@ -396,16 +396,19 @@ class MiaoshouRuntime(object):
             os.mkdir(self.prelude.cover_folder)
 
         dst = os.path.join(self.prelude.cover_folder, os.path.basename(cover_img))
-        if cover_img != self.prelude.no_preview_img and os.path.exists(cover_img) and os.path.exists(dst):
-            dst_size = os.stat(dst).st_size
-            cover_size = os.stat(cover_img).st_size
-            if dst_size != cover_size:
-                print('update to new cover')
+        try:
+            if cover_img != self.prelude.no_preview_img and os.path.exists(cover_img) and os.path.exists(dst):
+                dst_size = os.stat(dst).st_size
+                cover_size = os.stat(cover_img).st_size
+                if dst_size != cover_size:
+                    print('update to new cover')
+                    shutil.copyfile(cover_img, dst)
+            elif cover_img != self.prelude.no_preview_img and os.path.exists(cover_img) and not os.path.exists(dst):
                 shutil.copyfile(cover_img, dst)
-        elif cover_img != self.prelude.no_preview_img and os.path.exists(cover_img) and not os.path.exists(dst):
-            shutil.copyfile(cover_img, dst)
-        elif cover_img == self.prelude.no_preview_img:
-            dst = cover_img
+            elif cover_img == self.prelude.no_preview_img:
+                dst = cover_img
+        except Exception as e:
+            dst = self.prelude.no_preview_img
 
         for model in self.my_model_set:
             match = False
