@@ -9,12 +9,11 @@ import io
 import time
 import typing as t
 import gzip
-
+import git
 import gradio as gr
 import requests
 from bs4 import BeautifulSoup
 import subprocess
-from subprocess import check_output
 import modules
 
 #import tkinter as tk
@@ -836,11 +835,26 @@ class MiaoshouRuntime(object):
         self.update_boot_settings(version, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
         return gr.update(value=msg, visible=True)
 
+    def check_update(self):
+        update_status = 'latest'
+        show_update = False
+        repo = git.Repo(self.path)
+        for fetch in repo.remote().fetch(dry_run=True):
+            if fetch.flags != fetch.HEAD_UPTODATE:
+                show_update = True
+                update_status = "behind"
+                break
+
+        return gr.Markdown(visible=True, value=update_status), gr.Button(visible=show_update)
+
     def update_program(self):
         result = "Update successful, restart to take effective."
         try:
-            process = subprocess.Popen(["git", "pull"], stdout=subprocess.PIPE)
-            result = process.communicate()[0]
+            repo = git.Repo(self.prelude.ext_folder)
+            # Fix: `error: Your local changes to the following files would be overwritten by merge`,
+            # because WSL2 Docker set 755 file permissions instead of 644, this results to the error.
+            repo.git.fetch(all=True)
+            repo.git.reset('origin', hard=True)
             self.install_preset_models_if_needed()
         except Exception as e:
             result = str(e)

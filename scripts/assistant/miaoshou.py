@@ -323,11 +323,12 @@ class MiaoShouAssistant(object):
 
 
     def create_subtab_update(self) -> None:
-        with gr.TabItem('About', elem_id="about_update") as tab_update:
+        with gr.TabItem('Update', elem_id="about_update") as tab_update:
             with gr.Row():
                 txt_update_result = gr.Markdown(visible=False)
-            #with gr.Row():
-                # btn_update = gr.Button(value="Update Miaoshouai Assistant & Model Source")
+            with gr.Row():
+                btn_check_update = gr.Button(value="Check Update")
+                btn_update = gr.Button(visible=False, value="Update Miaoshouai Assistant & Model Source")
             with gr.Row():
                 gr.Markdown(value="About")
             with gr.Row():
@@ -350,7 +351,8 @@ class MiaoShouAssistant(object):
                     """
                 )
 
-            #btn_update.click(self.runtime.update_program, inputs=[], outputs=[txt_update_result])
+            btn_check_update.click(self.runtime.check_update, inputs=[], outputs=[txt_update_result, btn_update])
+            btn_update.click(self.runtime.update_program, inputs=[], outputs=[txt_update_result])
 
     def save_cmdline_args(self, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
         #print(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
