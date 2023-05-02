@@ -3,7 +3,8 @@ import sys
 import typing as t
 
 import gradio as gr
-
+from modules.sd_models import CheckpointInfo
+from modules.call_queue import wrap_queued_call
 import launch
 import modules
 from modules import shared
@@ -144,6 +145,15 @@ class MiaoShouAssistant(object):
                     with gr.Row():
                         btn_connect_modeldir = gr.Button(value="Apply Virtual Model Folder")
 
+                    with gr.Row().style(equal_height=True):
+                        my_search_text = gr.Textbox(
+                            label="Model name",
+                            show_label=False,
+                            max_lines=1,
+                            placeholder="Enter model name",
+                        )
+                        btn_my_search = gr.Button("Search")
+
                     with gr.Row():
                         my_model_source_dropdown = gr.Dropdown(
                             choices=["civitai.com", "liandange.com"],
@@ -159,7 +169,7 @@ class MiaoShouAssistant(object):
                                               interactive=True).style(full_width=True)
 
                     with gr.Row():
-                        my_models = self.runtime.get_local_models(my_model_type.value)
+                        my_models = self.runtime.get_local_models('', my_model_type.value)
                         self.runtime.ds_my_models = gr.Dataset(
                             components=[gr.Image(visible=False, label='Cover', elem_id='my_model_cover'),
                                         gr.Textbox(visible=False, label='ModelId'),
@@ -182,7 +192,16 @@ class MiaoShouAssistant(object):
                                          type="pil", visible=True)
 
                     with gr.Row(variant='panel'):
-                        btn_set_cover = gr.Button(visible=False, value='Set as Cover')
+                        with gr.Column():
+
+                            btn_load_model = gr.HTML(
+                                value=f'<div class="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;"' \
+                                        f'onclick="return selectCheckpoint()">Load Model</div>',
+                                visible=True)
+                        with gr.Column():
+                            btn_delete_model = gr.Button(visible=True, value='Delete Model')
+                        with gr.Column():
+                            btn_set_cover = gr.Button(visible=False, value='Set as Cover')
 
                     with gr.Row(variant='panel'):
                         generation_info = gr.Textbox(label='prompt', interactive=False, visible=True, elem_id="imginfo_generation_info")
@@ -200,23 +219,27 @@ class MiaoShouAssistant(object):
                     with gr.Row(variant='panel'):
                         html_my_model = gr.HTML(visible=False)
 
-        btn_set_cover.click(self.runtime.set_cover, inputs=[self.runtime.ds_my_models, c_image, my_model_type], outputs=[self.runtime.ds_my_models])
+
+        btn_set_cover.click(self.runtime.set_cover, inputs=[self.runtime.ds_my_models, c_image, my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
         #open_folder_button.click(self.runtime.open_folder, inputs=[model_folder_path], outputs=[model_folder_path])
         btn_connect_modeldir.click(self.runtime.change_model_folder, inputs=[model_folder_path], outputs=[md_result])
-        refresh_models_button.click(self.runtime.refresh_local_models, inputs=[my_model_type], outputs=[self.runtime.ds_my_models])
+        refresh_models_button.click(self.runtime.refresh_local_models, inputs=[my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
         my_model_source_dropdown.change(self.switch_my_model_source,
                                      inputs=[my_model_source_dropdown, my_model_type],
                                      outputs=[self.runtime.ds_my_models])
 
-        my_model_type.change(self.runtime.update_my_model_type, inputs=[my_model_type], outputs=[self.runtime.ds_my_models])
+        btn_my_search.click(self.runtime.search_my_model, inputs=[my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
+        my_model_type.change(self.runtime.update_my_model_type, inputs=[my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
 
         self.runtime.ds_my_models.click(self.runtime.get_my_model_covers,
-                                     inputs=[self.runtime.ds_my_models],
-                                     outputs=[self.runtime.ds_my_model_covers, html_my_model])
+                                     inputs=[self.runtime.ds_my_models, my_model_type],
+                                     outputs=[self.runtime.ds_my_model_covers, html_my_model, btn_load_model])
 
         self.runtime.ds_my_model_covers.click(self.runtime.update_cover_info,
                                         inputs=[self.runtime.ds_my_models, self.runtime.ds_my_model_covers],
                                         outputs=[btn_set_cover, generation_info, c_image])
+
+
 
         def tab_model_manager_select():
             self.runtime.active_model_set = 'my_model_set'
@@ -283,9 +306,9 @@ class MiaoShouAssistant(object):
                             dwn_button = gr.Button(value='Download',
                                                    visible=is_civitai_model_source_active, elem_id='ms_dwn_button')
                             open_url_in_browser_newtab_button = gr.HTML(
-                                value='<p style="text-align: center;">'
+                                value='<div class="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;">'
                                       '<a style="text-align: center;" href="http://www.liandange.com/models" '
-                                      'target="_blank">Download</a></p>',
+                                      'target="_blank">Download</a></div>',
                                 visible=not is_civitai_model_source_active)
                     with gr.Row():
                         model_info = gr.HTML(visible=True)
@@ -389,7 +412,7 @@ class MiaoShouAssistant(object):
 
     def switch_my_model_source(self, new_model_source: str, model_type):
         self.runtime.my_model_source = new_model_source
-        my_models = self.runtime.get_local_models(model_type)
+        my_models = self.runtime.get_local_models('', model_type)
         self.runtime.ds_my_models.samples = my_models
 
         if self.runtime.my_model_source not in ['official_models', 'controlnet']:
