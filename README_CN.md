@@ -3,6 +3,7 @@
 
 喵手助理 [Automatic1111 WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
+1.2 版更新：增加了模型搜索功能，可以直接在模型管理下load模型，增加了插件和模型源更新功能。
 1.1 版更新: 模型管理下增加了对Lora, embedding and hypernetwork等模型的支持。修复了启动时与秋叶启动器的冲突。
 
 ### 安装
