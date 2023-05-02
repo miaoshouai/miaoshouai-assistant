@@ -15,7 +15,7 @@ import requests
 from bs4 import BeautifulSoup
 import subprocess
 import modules
-
+import json
 #import tkinter as tk
 #from tkinter import filedialog, ttk
 from modules import shared, sd_hijack
@@ -310,20 +310,20 @@ class MiaoshouRuntime(object):
             return chk_point.sha256[0:10]
 
 
-    def update_my_model_type(self, model_type) -> t.Dict:
-        my_models = self.get_local_models(model_type)
+    def update_my_model_type(self, search_txt, model_type) -> t.Dict:
+        my_models = self.get_local_models(search_txt, model_type)
         self.ds_my_models.samples = my_models
 
         return gr.Dataset.update(samples=my_models)
 
-    def get_local_models(self, model_type) -> t.List[t.Any]:
+    def get_local_models(self, search_txt='', model_type='Checkpoint') -> t.List[t.Any]:
         models = []
 
         for root, dirs, files in os.walk(self.prelude.model_type[model_type]):
             for file in files:
                 mpath = os.path.join(root, file)
                 fname, ext = os.path.splitext(file)
-                if ext in ['.ckpt', '.safetensors', '.pt'] and file != 'scaler.pt':
+                if ext in ['.ckpt', '.safetensors', '.pt'] and file != 'scaler.pt' and (search_txt in fname or search_txt == ''):
                     chkpt_info = modules.sd_models.get_closet_checkpoint_match(file)
                     if chkpt_info is None:
                         chkpt_info = CheckpointInfo(os.path.join(root, file))
@@ -348,13 +348,13 @@ class MiaoshouRuntime(object):
         return models
 
 
-    def refresh_local_models(self, model_type) -> t.Dict:
-        my_models = self.get_local_models(model_type)
+    def refresh_local_models(self, search_txt, model_type) -> t.Dict:
+        my_models = self.get_local_models(search_txt, model_type)
         self.ds_my_models.samples = my_models
 
         return gr.Dataset.update(samples=my_models)
 
-    def set_cover(self, model, cover, model_type):
+    def set_cover(self, model, cover, search_txt, model_type):
         fname = model[3][0]
         mname, ext = os.path.splitext(fname)
         mfolder = self.prelude.model_type[model_type]
@@ -362,7 +362,7 @@ class MiaoshouRuntime(object):
         dst = os.path.join(mfolder, f'{mname}.jpg')
         cover.save(dst)
 
-        my_models = self.get_local_models(model_type)
+        my_models = self.get_local_models(search_txt, model_type)
         self.ds_my_models.samples = my_models
 
         return gr.Dataset.update(samples=my_models)
@@ -460,6 +460,16 @@ class MiaoshouRuntime(object):
             return {}
 
         new_list = self.get_images_html(search, model_type)
+
+        self._ds_models.samples = new_list
+        return self._ds_models.update(samples=new_list)
+
+    def search_my_model(self, search_txt='', model_type='Checkpoint') -> t.Dict:
+        if self._ds_models is None:
+            self.logger.error(f"_ds_models is not initialized")
+            return {}
+
+        new_list = self.get_local_models(search_txt, model_type)
 
         self._ds_models.samples = new_list
         return self._ds_models.update(samples=new_list)
@@ -564,7 +574,7 @@ class MiaoshouRuntime(object):
                                  'target="_blank">Download</a></p>')
         )
 
-    def get_my_model_covers(self, model):
+    def get_my_model_covers(self, model, model_type):
         img_list, l1, htmlDetail, h2 = self.get_model_info(model)
         if self._ds_my_model_covers is None:
             self.logger.error(f"_ds_my_model_covers is not initialized")
@@ -584,8 +594,22 @@ class MiaoshouRuntime(object):
             cover_html += '</div>\n</div>'
             cover_list.append([cover_html])
 
+        if model_type == 'TextualInversion':
+            mname, ext = os.path.splitext(model[3][0])
+            button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
+                            f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;{mname}&quot;, true)"><a href="javascript:void(0)">Send to Prompt</a></div>'
+        elif model_type == 'LORA':
+            mname, ext = os.path.splitext(model[3][0])
+            button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
+                          f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;<lora:{mname}:&quot; + opts.extra_networks_default_multiplier + &quot;>&quot;, false)"><a href="javascript:void(0)">Send to Prompt</a></div>'
+        else:
+            mpath = os.path.join(self.prelude.model_type[model_type], model[3][0])
+            checkpoint_info = CheckpointInfo(mpath)
+            button_html = f'<div class="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;"' \
+                          f'onclick="return selectCheckpoint(&quot;{checkpoint_info.title}&quot;)"><a href="javascript:void(0)">Load Model</a></div>'
+
         self._ds_my_model_covers.samples = cover_list
-        return self._ds_my_model_covers.update(samples=cover_list), gr.HTML.update(visible=True, value=new_html)
+        return self._ds_my_model_covers.update(samples=cover_list), gr.HTML.update(visible=True, value=new_html), gr.HTML.update(visible=True, value=button_html)
 
 
     def update_cover_info(self, model, covers):
