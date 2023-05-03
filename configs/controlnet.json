@@ -645,7 +645,7 @@
                             "CRC32": "87F68C12",
                             "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
                         },
-                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11u_sd15_tile.pth",
+                        "downloadUrl": "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11f1e_sd15_tile.pth",
                         "primary": false
                     },
                     {
