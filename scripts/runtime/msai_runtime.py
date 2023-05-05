@@ -424,7 +424,6 @@ class MiaoshouRuntime(object):
                         match = (lookup_shash[:10].upper() in [h.upper() for h in file['hashes'].values()])
 
                     if match:
-                        #cover_link = ver['images'][0]['url'].replace('width=450', 'width=100')
                         mid = model['id']
                         res = [
                             dst,
@@ -594,7 +593,6 @@ class MiaoshouRuntime(object):
             cover_html += f'<div style = "margin-right: 10px;" class ="model-item" >\n'
             if len(img_link) > 0:
                 cover_html += f'{img_link[0]}\n'
-                #cover_html += f'<img src="{img_link[0].replace("width=450","width=100")}" style="width:100px;">\n'
 
             cover_html += '</div>\n</div>'
             cover_list.append([cover_html])
@@ -621,7 +619,6 @@ class MiaoshouRuntime(object):
 
         soup = BeautifulSoup(covers[0])
         cover_url = soup.findAll('img')[0]['src'].replace('width=150', 'width=450')
-        print(cover_url)
 
         if self.my_model_set is None:
             self.logger.error("model_set is null")
