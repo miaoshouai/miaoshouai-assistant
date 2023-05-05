@@ -38,6 +38,7 @@ class MiaoshouRuntime(object):
         self._model_set_last_access_time: datetime.datetime = None
         self._my_model_set_last_access_time: datetime.datetime = None
         self._ds_models: gr.Dataset = None
+        self._ds_cover_gallery: gr.Dataset = None
         self._ds_my_models: gr.Dataset = None
         self._ds_my_model_covers: gr.Dataset = None
         self._allow_nsfw: bool = False
@@ -502,7 +503,7 @@ class MiaoshouRuntime(object):
                 for img in latest_version['images']:
                     if self.allow_nsfw or (not self.allow_nsfw and not img.get('nsfw')):
                         if img.get('url'):
-                            cover_imgs.append([img['url'], ''])
+                            cover_imgs.append([f'<img src="{img["url"].replace("width=450","width=150").replace("/w/100", "/w/150")}" style="width:150px;">'])
 
             if latest_version.get('files') and isinstance(latest_version.get('files'), list):
                 for file in latest_version['files']:
@@ -565,6 +566,9 @@ class MiaoshouRuntime(object):
             htmlDetail += "</tbody></table></div>"
             htmlDetail += f"<div>{m['description'] if m.get('description') else 'N/A'}</div>"
 
+        self._ds_cover_gallery.samples = cover_imgs
+
+
         return (
             cover_imgs,
             gr.Dropdown.update(choices=drop_list, value=drop_list[0] if len(drop_list) > 0 else []),
@@ -589,7 +593,8 @@ class MiaoshouRuntime(object):
             cover_html = '<div style="display: flex; align-items: center;">\n'
             cover_html += f'<div style = "margin-right: 10px;" class ="model-item" >\n'
             if len(img_link) > 0:
-                cover_html += f'<img src="{img_link[0].replace("width=450","width=100")}" style="width:100px;">\n'
+                cover_html += f'{img_link[0]}\n'
+                #cover_html += f'<img src="{img_link[0].replace("width=450","width=100")}" style="width:100px;">\n'
 
             cover_html += '</div>\n</div>'
             cover_list.append([cover_html])
@@ -661,7 +666,7 @@ class MiaoshouRuntime(object):
         if fname is not None and not os.path.exists(fname):
             if self.my_model_source == 'liandange.com':
                 cover_url = soup.findAll('img')[0]['src'].replace('/w/100', '/w/450')
-            r = requests.get(cover_url, stream=True)
+            r = requests.get(cover_url, timeout=30, stream=True)
             r.raw.decode_content = True
             with open(fname, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
@@ -872,9 +877,9 @@ class MiaoshouRuntime(object):
                 update_status = "behind"
                 break
 
-        return gr.Markdown.update(visible=True, value=update_status), gr.Button.update(visible=show_update)
+        return gr.Markdown.update(visible=True, value=update_status), gr.Checkbox.update(visible=show_update), gr.Button.update(visible=show_update)
 
-    def update_program(self):
+    def update_program(self, dont_update_ms=False):
         result = "Update successful, restart to take effective."
         try:
             repo = git.Repo(self.prelude.ext_folder)
@@ -882,7 +887,8 @@ class MiaoshouRuntime(object):
             # because WSL2 Docker set 755 file permissions instead of 644, this results to the error.
             repo.git.fetch(all=True)
             repo.git.reset('origin', hard=True)
-            self.install_preset_models_if_needed()
+            if not dont_update_ms:
+                self.install_preset_models_if_needed()
         except Exception as e:
             result = str(e)
 
@@ -941,6 +947,14 @@ class MiaoshouRuntime(object):
     @ds_models.setter
     def ds_models(self, newone: gr.Dataset):
         self._ds_models = newone
+
+    @property
+    def ds_cover_gallery(self) -> gr.Dataset:
+        return self._ds_cover_gallery
+
+    @ds_cover_gallery.setter
+    def ds_cover_gallery(self, newone: gr.Dataset):
+        self._ds_cover_gallery = newone
 
     @property
     def ds_my_models(self) -> gr.Dataset:

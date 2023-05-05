@@ -288,8 +288,16 @@ class MiaoShouAssistant(object):
 
                 with gr.Column(elem_id="col_model_info"):
                     with gr.Row():
-                        cover_gallery = gr.Gallery(label="Cover", show_label=False, visible=True).style(grid=[4],
-                                                                                                        height="2")
+                        #cover_gallery = gr.Gallery(label="Cover", show_label=False, visible=True).style(grid=[4],
+                        #                                                                                height="2")
+                        self.runtime.ds_cover_gallery = gr.Dataset(
+                            components=[gr.HTML(visible=False)],
+                            headers=None,
+                            type="values",
+                            label="Cover",
+                            samples=[],
+                            samples_per_page=10,
+                            elem_id="ds_cover_gallery").style(type="gallery", container=True)
 
                     with gr.Row():
                         with gr.Column():
@@ -325,7 +333,7 @@ class MiaoShouAssistant(object):
         self.runtime.ds_models.click(self.runtime.get_model_info,
                                      inputs=[self.runtime.ds_models],
                                      outputs=[
-                                         cover_gallery,
+                                         self.runtime.ds_cover_gallery,
                                          model_dropdown,
                                          model_info,
                                          open_url_in_browser_newtab_button
@@ -351,6 +359,8 @@ class MiaoShouAssistant(object):
                 txt_update_result = gr.Markdown(visible=False)
             with gr.Row():
                 btn_check_update = gr.Button(value="Check Update")
+            with gr.Row():
+                chk_dont_update_ms = gr.Checkbox(visible=False, label="Do not update model source", value=False)
                 btn_update = gr.Button(visible=False, value="Update Miaoshouai Assistant & Model Source")
             with gr.Row():
                 gr.Markdown(value="About")
@@ -374,8 +384,8 @@ class MiaoShouAssistant(object):
                     """
                 )
 
-            btn_check_update.click(self.runtime.check_update, inputs=[], outputs=[txt_update_result, btn_update])
-            btn_update.click(self.runtime.update_program, inputs=[], outputs=[txt_update_result])
+            btn_check_update.click(self.runtime.check_update, inputs=[], outputs=[txt_update_result, chk_dont_update_ms, btn_update])
+            btn_update.click(self.runtime.update_program, inputs=[chk_dont_update_ms], outputs=[txt_update_result])
 
     def save_cmdline_args(self, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
         #print(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args)
