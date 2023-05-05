@@ -288,8 +288,6 @@ class MiaoShouAssistant(object):
 
                 with gr.Column(elem_id="col_model_info"):
                     with gr.Row():
-                        #cover_gallery = gr.Gallery(label="Cover", show_label=False, visible=True).style(grid=[4],
-                        #                                                                                height="2")
                         self.runtime.ds_cover_gallery = gr.Dataset(
                             components=[gr.HTML(visible=False)],
                             headers=None,
