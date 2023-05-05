@@ -620,7 +620,8 @@ class MiaoshouRuntime(object):
     def update_cover_info(self, model, covers):
 
         soup = BeautifulSoup(covers[0])
-        cover_url = soup.findAll('img')[0]['src'].replace('width=100', 'width=450')
+        cover_url = soup.findAll('img')[0]['src'].replace('width=150', 'width=450')
+        print(cover_url)
 
         if self.my_model_set is None:
             self.logger.error("model_set is null")
@@ -665,7 +666,7 @@ class MiaoshouRuntime(object):
 
         if fname is not None and not os.path.exists(fname):
             if self.my_model_source == 'liandange.com':
-                cover_url = soup.findAll('img')[0]['src'].replace('/w/100', '/w/450')
+                cover_url = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450')
             r = requests.get(cover_url, timeout=30, stream=True)
             r.raw.decode_content = True
             with open(fname, 'wb') as f:
