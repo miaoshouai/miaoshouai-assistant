@@ -643,6 +643,8 @@ class MiaoshouRuntime(object):
             if model_fname in filename:
                 m_pre, m_ext = os.path.splitext(model_fname)
                 cover_fname = f"{m_pre}.jpg"
+                soup = BeautifulSoup(f['cover'])
+                cover_link = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450').replace('width=150', 'width=450')
 
                 if f['type'] == 'LORA':
                     cover_fname = os.path.join(model_path, 'Lora', cover_fname)
@@ -663,7 +665,7 @@ class MiaoshouRuntime(object):
                     cover_fname = os.path.join(model_path, 'Stable-diffusion', cover_fname)
                     model_fname = os.path.join(model_path, 'Stable-diffusion', model_fname)
 
-                urls.append((f['cover'], f['url'], f['size'], cover_fname, model_fname))
+                urls.append((cover_link, f['url'], f['size'], cover_fname, model_fname))
                 break
 
         for (cover_url, model_url, total_size, local_cover_name, local_model_name) in urls:
