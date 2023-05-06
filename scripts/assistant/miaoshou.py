@@ -219,7 +219,7 @@ class MiaoShouAssistant(object):
                     with gr.Row(variant='panel'):
                         html_my_model = gr.HTML(visible=False)
 
-
+        btn_delete_model.click(self.runtime.delete_model, inputs=[self.runtime.ds_my_models, my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
         btn_set_cover.click(self.runtime.set_cover, inputs=[self.runtime.ds_my_models, c_image, my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
         #open_folder_button.click(self.runtime.open_folder, inputs=[model_folder_path], outputs=[model_folder_path])
         btn_connect_modeldir.click(self.runtime.change_model_folder, inputs=[model_folder_path], outputs=[md_result])

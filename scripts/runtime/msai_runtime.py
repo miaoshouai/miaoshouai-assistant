@@ -154,68 +154,13 @@ class MiaoshouRuntime(object):
         self.add_arg(more_args.replace('\\\\', '\\'))
         self._old_additional = more_args.replace('\\\\', '\\')
 
-    def fetch_all_models(self) -> t.List[t.Dict]:
-        print('start fetching...')
-        endpoint_url = self.prelude.api_url(self.model_source)
-        if endpoint_url is None:
-            self.logger.error(f"{self.model_source} is not supported")
-            return []
-
-        self.logger.info(f"start to fetch model info from '{self.model_source}':{endpoint_url}")
-
-        limit_threshold = 100
-
-        all_set = []
-        response = requests.get(endpoint_url + f'?page=1&limit={limit_threshold}')
-        num_of_pages = response.json()['metadata']['totalPages']
-        total_items = response.json()['metadata']['totalItems']
-        remain_items = total_items
-        self.logger.info(f"total pages = {num_of_pages}")
-
-        continuous_error_counts = 0
-
-        for p in range(1, num_of_pages+2):
-            try:
-                remain_items -= limit_threshold
-                print(remain_items)
-                if remain_items < limit_threshold:
-                    limit_threshold = remain_items
-                response = requests.get(endpoint_url + f'?page={p}&limit={limit_threshold}')
-                payload = response.json()
-                if payload.get("success") is not None and not payload.get("success"):
-                    self.logger.error(f"failed to fetch page[{p}]")
-                    continuous_error_counts += 1
-                    if continuous_error_counts > 10:
-                        break
-                    else:
-                        continue
-
-                continuous_error_counts = 0  # reset error flag
-                self.logger.debug(f"start to process page[{p}]")
-
-                for model in payload['items']:
-                    print(f"{p}/{num_of_pages}: model")
-                    all_set.append(model)
-
-                self.logger.debug(f"page[{p}] : {len(payload['items'])} items added")
-            except Exception as e:
-                self.logger.error(f"failed to fetch page[{p}] due to {e}")
-                time.sleep(3)
-
-        if len(all_set) > 0:
-            self.prelude.update_model_json(self.model_source, all_set)
-        else:
-            self.logger.error("fetch_all_models: emtpy body received")
-
-        return all_set
-
     def refresh_all_models(self) -> None:
-        if self.fetch_all_models():
-            if self.ds_models:
-                self.ds_models.samples = self.model_set
-                self.ds_models.update(samples=self.model_set)
-            else:
-                self.logger.error(f"ds models is null")
+        self.install_preset_models_if_needed()
+        if self.ds_models:
+            self.ds_models.samples = self.model_set
+            self.ds_models.update(samples=self.model_set)
+        else:
+            self.logger.error(f"ds models is null")
 
     def get_images_html(self, search: str = '', model_type: str = 'All') -> t.List[str]:
         self.logger.info(f"get_image_html: model_type = {model_type}, and search pattern = '{search}'")
@@ -350,6 +295,17 @@ class MiaoshouRuntime(object):
 
 
     def refresh_local_models(self, search_txt, model_type) -> t.Dict:
+        my_models = self.get_local_models(search_txt, model_type)
+        self.ds_my_models.samples = my_models
+
+        return gr.Dataset.update(samples=my_models)
+
+    def delete_model(self, model, search_txt, model_type):
+        fname = model[3][0]
+        mfolder = self.prelude.model_type[model_type]
+        mpapth = os.path.join(mfolder, fname)
+
+        os.remove(mpapth)
         my_models = self.get_local_models(search_txt, model_type)
         self.ds_my_models.samples = my_models
 
@@ -500,7 +456,7 @@ class MiaoshouRuntime(object):
 
             if latest_version.get('images') and isinstance(latest_version.get('images'), list):
                 for img in latest_version['images']:
-                    if self.allow_nsfw or (not self.allow_nsfw and not img.get('nsfw')):
+                    if self.allow_nsfw or (not self.allow_nsfw and (not img.get('nsfw') or img.get('nsfw') in ['None', 'Soft'])):
                         if img.get('url'):
                             cover_imgs.append([f'<img src="{img["url"].replace("width=450","width=150").replace("/w/100", "/w/150")}" style="width:150px;">'])
 
@@ -566,7 +522,6 @@ class MiaoshouRuntime(object):
             htmlDetail += f"<div>{m['description'] if m.get('description') else 'N/A'}</div>"
 
         self._ds_cover_gallery.samples = cover_imgs
-
 
         return (
             cover_imgs,
@@ -906,7 +861,7 @@ class MiaoshouRuntime(object):
                 self._model_set_last_access_time = model_json_mtime
                 self.logger.info(f"load '{self.model_source}' model data from local file")
         except Exception as e:
-            self._model_set = self.fetch_all_models()
+            self.refresh_all_models()
             self._model_set_last_access_time = datetime.datetime.now()
 
         return self._model_set
@@ -924,7 +879,7 @@ class MiaoshouRuntime(object):
                 self._my_model_set_last_access_time = model_json_mtime
                 self.logger.info(f"load '{self.my_model_source}' model data from local file")
         except Exception as e:
-            self._my_model_set = self.fetch_all_models()
+            self.refresh_all_models()
             self._my_model_set_last_access_time = datetime.datetime.now()
 
         return self._my_model_set

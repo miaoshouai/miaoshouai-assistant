@@ -12,7 +12,7 @@
         "drp_choose_version": "Python Integrated",
         "txt_args_more": "--theme dark",
         "disable_log_console_output": true,
-        "model_source": "liandange.com",
+        "model_source": "civitai.com",
         "my_model_source": "liandange.com"
     }
 }
