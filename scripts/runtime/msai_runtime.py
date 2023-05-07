@@ -427,8 +427,8 @@ class MiaoshouRuntime(object):
 
         new_list = self.get_local_models(search_txt, model_type)
 
-        self._ds_models.samples = new_list
-        return self._ds_models.update(samples=new_list)
+        self._ds_my_models.samples = new_list
+        return self._ds_my_models.update(samples=new_list)
 
     def get_model_info(self, models) -> t.Tuple[t.List[t.List[str]], t.Dict, str, t.Dict]:
         drop_list = []

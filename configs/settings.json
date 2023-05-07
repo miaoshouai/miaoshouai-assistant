@@ -13,6 +13,6 @@
         "txt_args_more": "--theme dark",
         "disable_log_console_output": true,
         "model_source": "civitai.com",
-        "my_model_source": "liandange.com"
+        "my_model_source": "civitai.com"
     }
 }
