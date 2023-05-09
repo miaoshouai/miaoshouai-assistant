@@ -155,7 +155,7 @@ class MiaoshouRuntime(object):
         self._old_additional = more_args.replace('\\\\', '\\')
 
     def refresh_all_models(self) -> None:
-        self.install_preset_models_if_needed()
+        self.install_preset_models_if_needed(True)
         if self.ds_models:
             self.ds_models.samples = self.model_set
             self.ds_models.update(samples=self.model_set)
@@ -710,18 +710,21 @@ class MiaoshouRuntime(object):
         #self.model_files.clear()
         return gr.HTML.update(value=f"<h4>{len(urls)} downloading tasks added into task list</h4>")
 
-    def install_preset_models_if_needed(self):
+    def install_preset_models_if_needed(self, update_ds: bool):
         assets_folder = os.path.join(self.prelude.ext_folder, "assets")
         configs_folder = os.path.join(self.prelude.ext_folder, "configs")
 
         for model_filename in ["civitai_models.json", "liandange_models.json"]:
             gzip_file = os.path.join(assets_folder, f"{model_filename}.gz")
             target_file = os.path.join(configs_folder, f"{model_filename}")
-            with gzip.open(gzip_file, "rb") as compressed_file:
-                with io.TextIOWrapper(compressed_file, encoding="utf-8") as decoder:
-                    content = decoder.read()
-                    with open(target_file, "w") as model_file:
-                        model_file.write(content)
+
+            if update_ds or not os.path.exists(target_file):
+                print('unzipping...')
+                with gzip.open(gzip_file, "rb") as compressed_file:
+                    with io.TextIOWrapper(compressed_file, encoding="utf-8") as decoder:
+                        content = decoder.read()
+                        with open(target_file, "w") as model_file:
+                            model_file.write(content)
 
     def get_dir_and_file(self, file_path):
         dir_path, file_name = os.path.split(file_path)
@@ -844,7 +847,7 @@ class MiaoshouRuntime(object):
             repo.git.reset('origin', hard=True)
             if not dont_update_ms:
                 print('Updating model source...')
-                self.install_preset_models_if_needed()
+                self.install_preset_models_if_needed(True)
         except Exception as e:
             result = str(e)
 
@@ -854,7 +857,7 @@ class MiaoshouRuntime(object):
     @property
     def model_set(self) -> t.List[t.Dict]:
         try:
-            self.install_preset_models_if_needed()
+            self.install_preset_models_if_needed(False)
             self.logger.info(f"access to model info for '{self.model_source}'")
             model_json_mtime = toolkit.get_file_last_modified_time(self.prelude.model_json[self.model_source])
 
@@ -872,7 +875,7 @@ class MiaoshouRuntime(object):
     @property
     def my_model_set(self) -> t.List[t.Dict]:
         try:
-            self.install_preset_models_if_needed()
+            self.install_preset_models_if_needed(False)
             self.logger.info(f"access to model info for '{self.my_model_source}'")
             model_json_mtime = toolkit.get_file_last_modified_time(self.prelude.model_json[self.my_model_source])
 
