@@ -829,7 +829,14 @@ class MiaoshouRuntime(object):
         update_status = 'latest'
         show_update = False
         repo = git.Repo(self.prelude.ext_folder)
+        asset_repo = git.Repo(self.prelude.asset_folder)
         for fetch in repo.remote().fetch(dry_run=True):
+            if fetch.flags != fetch.HEAD_UPTODATE:
+                show_update = True
+                update_status = "behind"
+                break
+
+        for fetch in asset_repo.remote().fetch(dry_run=True):
             if fetch.flags != fetch.HEAD_UPTODATE:
                 show_update = True
                 update_status = "behind"
