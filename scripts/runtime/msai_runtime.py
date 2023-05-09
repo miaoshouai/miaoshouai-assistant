@@ -719,12 +719,13 @@ class MiaoshouRuntime(object):
             target_file = os.path.join(configs_folder, f"{model_filename}")
 
             if update_ds or not os.path.exists(target_file):
-                print('unzipping...')
                 with gzip.open(gzip_file, "rb") as compressed_file:
                     with io.TextIOWrapper(compressed_file, encoding="utf-8") as decoder:
                         content = decoder.read()
                         with open(target_file, "w") as model_file:
                             model_file.write(content)
+
+                print('Data source unpacked successfully')
 
     def get_dir_and_file(self, file_path):
         dir_path, file_name = os.path.split(file_path)
