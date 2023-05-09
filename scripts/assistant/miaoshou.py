@@ -359,7 +359,7 @@ class MiaoShouAssistant(object):
                 btn_check_update = gr.Button(value="Check Update")
             with gr.Row():
                 chk_dont_update_ms = gr.Checkbox(visible=False, label="Do not update model source", value=False)
-                btn_update = gr.Button(visible=False, value="Update Miaoshouai Assistant")
+                btn_update = gr.Button(visible=True, value="Update Miaoshouai Assistant")
             with gr.Row():
                 gr.Markdown(value="About")
             with gr.Row():
