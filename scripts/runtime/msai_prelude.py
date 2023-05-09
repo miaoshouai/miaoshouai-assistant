@@ -41,6 +41,7 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         self._ext_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
         self._setting_file = os.path.join(self.ext_folder, "configs", "settings.json")
         self._model_hash_file = os.path.join(self.ext_folder, "configs", "model_hash.json")
+        self._asset_folder = os.path.join(self.ext_folder, "assets")
         self._cache_folder = os.path.join(self.ext_folder, "cache")
         self._cover_folder = os.path.join(self.ext_folder, "covers")
         self._no_preview_img = os.path.join(modules.paths.script_path, "html", "card-no-preview.png")
@@ -117,6 +118,10 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
     @property
     def cache_folder(self) -> str:
         return self._cache_folder
+
+    @property
+    def asset_folder(self) -> str:
+        return self._asset_folder
 
     @property
     def cover_folder(self) -> str:
