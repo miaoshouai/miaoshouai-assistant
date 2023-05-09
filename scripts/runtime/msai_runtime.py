@@ -717,12 +717,11 @@ class MiaoshouRuntime(object):
         for model_filename in ["civitai_models.json", "liandange_models.json"]:
             gzip_file = os.path.join(assets_folder, f"{model_filename}.gz")
             target_file = os.path.join(configs_folder, f"{model_filename}")
-            if not os.path.exists(target_file):
-                with gzip.open(gzip_file, "rb") as compressed_file:
-                    with io.TextIOWrapper(compressed_file, encoding="utf-8") as decoder:
-                        content = decoder.read()
-                        with open(target_file, "w") as model_file:
-                            model_file.write(content)
+            with gzip.open(gzip_file, "rb") as compressed_file:
+                with io.TextIOWrapper(compressed_file, encoding="utf-8") as decoder:
+                    content = decoder.read()
+                    with open(target_file, "w") as model_file:
+                        model_file.write(content)
 
     def get_dir_and_file(self, file_path):
         dir_path, file_name = os.path.split(file_path)
@@ -837,12 +836,14 @@ class MiaoshouRuntime(object):
     def update_program(self, dont_update_ms=False):
         result = "Update successful, restart to take effective."
         try:
+            print('Updating miaoshouai-assistant...')
             repo = git.Repo(self.prelude.ext_folder)
             # Fix: `error: Your local changes to the following files would be overwritten by merge`,
             # because WSL2 Docker set 755 file permissions instead of 644, this results to the error.
             repo.git.fetch(all=True)
             repo.git.reset('origin', hard=True)
             if not dont_update_ms:
+                print('Updating model source...')
                 self.install_preset_models_if_needed()
         except Exception as e:
             result = str(e)
