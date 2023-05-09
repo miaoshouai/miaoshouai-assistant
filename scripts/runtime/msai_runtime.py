@@ -836,7 +836,9 @@ class MiaoshouRuntime(object):
                 update_status = "behind"
                 break
 
-        for fetch in asset_repo.remote().fetch(dry_run=True):
+        for submodule in repo.submodules:
+            sub_repo = submodule.module()
+            fetch = sub_repo.git.remote().fetch(dry_run=True)
             if fetch.flags != fetch.HEAD_UPTODATE:
                 show_update = True
                 update_status = "behind"
@@ -848,18 +850,14 @@ class MiaoshouRuntime(object):
         result = "Update successful, restart to take effective."
         try:
             print('Updating miaoshouai-assistant...')
-            repo = git.Repo(self.prelude.asset_folder)
+            repo = git.Repo(self.prelude.ext_folder)
             # Fix: `error: Your local changes to the following files would be overwritten by merge`,
             # because WSL2 Docker set 755 file permissions instead of 644, this results to the error.
             repo.git.fetch(all=True)
             repo.git.reset('origin', hard=True)
             if not dont_update_ms:
                 print('Updating model source...')
-                repo = git.Repo(self.prelude.asset_folder)
-                # Fix: `error: Your local changes to the following files would be overwritten by merge`,
-                # because WSL2 Docker set 755 file permissions instead of 644, this results to the error.
-                repo.git.fetch(all=True)
-                repo.git.reset('origin', hard=True)
+                repo.git.submodule('update', '--init')
                 self.install_preset_models_if_needed(True)
         except Exception as e:
             result = str(e)
