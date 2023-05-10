@@ -836,9 +836,7 @@ class MiaoshouRuntime(object):
                 update_status = "behind"
                 break
 
-        for submodule in repo.submodules:
-            sub_repo = submodule.module()
-            fetch = sub_repo.git.remote().fetch(dry_run=True)
+        for fetch in asset_repo.remote().fetch(dry_run=True):
             if fetch.flags != fetch.HEAD_UPTODATE:
                 show_update = True
                 update_status = "behind"
@@ -857,7 +855,9 @@ class MiaoshouRuntime(object):
             repo.git.reset('origin', hard=True)
             if not dont_update_ms:
                 print('Updating model source...')
-                repo.git.submodule('update', '--init')
+                repo = git.Repo(self.prelude.asset_folder)
+                repo.git.fetch(all=True)
+                repo.git.reset('origin', hard=True)
                 self.install_preset_models_if_needed(True)
         except Exception as e:
             result = str(e)
