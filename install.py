@@ -2,6 +2,8 @@ import launch
 import os
 import gzip
 import io
+import git
+import shutil
 
 def install_preset_models_if_needed():
     assets_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
