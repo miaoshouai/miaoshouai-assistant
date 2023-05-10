@@ -890,7 +890,7 @@ class MiaoshouRuntime(object):
             repo.git.fetch(all=True)
             repo.git.reset('origin', hard=True)
             if not dont_update_ms:
-                sub_repo = git.Repo(self.prelude.asset_folder)
+                sub_repo = git.Repo(self.prelude.assets_folder)
                 sub_repo.git.fetch(all=True)
                 sub_repo.git.reset('origin', hard=True)
                 self.install_preset_models_if_needed(True)
