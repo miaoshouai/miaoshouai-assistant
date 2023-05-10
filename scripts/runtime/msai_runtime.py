@@ -51,6 +51,7 @@ class MiaoshouRuntime(object):
 
         self.downloader_manager = MiaoshouDownloaderManager()
 
+
     def get_default_args(self, commandline_args: t.List[str] = None):
         if commandline_args is None:
             commandline_args: t.List[str] = toolkit.get_args(sys.argv[1:])
@@ -727,6 +728,25 @@ class MiaoshouRuntime(object):
 
                 print('Data source unpacked successfully')
 
+    def relocate_assets_if_needed(self):
+        repo = git.Repo(self.prelude.ext_folder)
+        print('Updating asset repo...')
+        try:
+            old_repo = True
+            if os.path.exists(self.prelude.assets_folder):
+                for filename in os.listdir(self.prelude.assets_folder):
+                    if '.git' in filename:
+                        old_repo = False
+                        break
+
+                if old_repo:
+                    shutil.rmtree(self.prelude.assets_folder)
+
+            for submodule in repo.submodules:
+                submodule.update(init=True)
+        except Exception as e:
+            print('error', str(e))
+
     def get_dir_and_file(self, file_path):
         dir_path, file_name = os.path.split(file_path)
         return (dir_path, file_name)
@@ -845,14 +865,10 @@ class MiaoshouRuntime(object):
                     update_status = "behind"
                     break
         except Exception as e:
-            print('preparing relocation for assets from github to coding')
-            for root, dirs, files in os.walk(self.prelude.asset_folder):
-                for f in files:
-                    os.unlink(os.path.join(root, f))
-                for d in dirs:
-                    shutil.rmtree(os.path.join(root, d))
-            for submodule in repo.submodules:
-                submodule.update(init=True)
+            self.logger.info(f"Error during checking asset, try to relocate.\n{str(e)}")
+            self.relocate_assets_if_needed()
+            show_update = True
+            update_status = "behind"
 
         return gr.Markdown.update(visible=True, value=update_status), gr.Checkbox.update(visible=show_update), gr.Button.update(visible=show_update)
 
@@ -866,9 +882,6 @@ class MiaoshouRuntime(object):
             repo.git.fetch(all=True)
             repo.git.reset('origin', hard=True)
             if not dont_update_ms:
-                print('Updating model source...')
-                for submodule in repo.submodules:
-                    submodule.update(init=True)
                 sub_repo = git.Repo(self.prelude.asset_folder)
                 sub_repo.git.fetch(all=True)
                 sub_repo.git.reset('origin', hard=True)
