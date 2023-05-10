@@ -857,18 +857,26 @@ class MiaoshouRuntime(object):
                 break
 
         print('Checking updates for data source...')
-        try:
-            asset_repo = git.Repo(self.prelude.asset_folder)
-            for fetch in asset_repo.remote().fetch(dry_run=True):
-                if fetch.flags != fetch.HEAD_UPTODATE:
-                    show_update = True
-                    update_status = "behind"
-                    break
-        except Exception as e:
-            self.logger.info(f"Error during checking asset, try to relocate.\n{str(e)}")
+        if os.path.exists(self.prelude.assets_folder):
+            fcount = len([entry for entry in os.listdir(self.prelude.assets_folder) if os.path.isfile(os.path.join(self.prelude.assets_folder, entry))])
+
+        if not os.path.exists(self.prelude.assets_folder) or fcount <= 0:
             self.relocate_assets_if_needed()
             show_update = True
             update_status = "behind"
+        else:
+            try:
+                asset_repo = git.Repo(self.prelude.asset_folder)
+                for fetch in asset_repo.remote().fetch(dry_run=True):
+                    if fetch.flags != fetch.HEAD_UPTODATE:
+                        show_update = True
+                        update_status = "behind"
+                        break
+            except Exception as e:
+                self.logger.info(f"Error during checking asset, try to relocate.\n{str(e)}")
+                self.relocate_assets_if_needed()
+                show_update = True
+                update_status = "behind"
 
         return gr.Markdown.update(visible=True, value=update_status), gr.Checkbox.update(visible=show_update), gr.Button.update(visible=show_update)
 
