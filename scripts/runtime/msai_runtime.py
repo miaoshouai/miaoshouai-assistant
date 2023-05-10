@@ -829,18 +829,30 @@ class MiaoshouRuntime(object):
         update_status = 'latest'
         show_update = False
         repo = git.Repo(self.prelude.ext_folder)
-        asset_repo = git.Repo(self.prelude.asset_folder)
+        print('Checking updates for miaoshouai-assistant...')
         for fetch in repo.remote().fetch(dry_run=True):
             if fetch.flags != fetch.HEAD_UPTODATE:
                 show_update = True
                 update_status = "behind"
                 break
 
-        for fetch in asset_repo.remote().fetch(dry_run=True):
-            if fetch.flags != fetch.HEAD_UPTODATE:
-                show_update = True
-                update_status = "behind"
-                break
+        print('Checking updates for data source...')
+        try:
+            asset_repo = git.Repo(self.prelude.asset_folder)
+            for fetch in asset_repo.remote().fetch(dry_run=True):
+                if fetch.flags != fetch.HEAD_UPTODATE:
+                    show_update = True
+                    update_status = "behind"
+                    break
+        except Exception as e:
+            print('preparing relocation for assets from github to coding')
+            for root, dirs, files in os.walk(self.prelude.asset_folder):
+                for f in files:
+                    os.unlink(os.path.join(root, f))
+                for d in dirs:
+                    shutil.rmtree(os.path.join(root, d))
+            for submodule in repo.submodules:
+                submodule.update(init=True)
 
         return gr.Markdown.update(visible=True, value=update_status), gr.Checkbox.update(visible=show_update), gr.Button.update(visible=show_update)
 
