@@ -252,7 +252,7 @@ class MiaoShouAssistant(object):
             with gr.Row():
                 with gr.Column(elem_id="col_model_list"):
                     with gr.Row().style(equal_height=True):
-                        model_source_dropdown = gr.Dropdown(choices=["civitai.com", "liandange.com", "official_models", "controlnet"],
+                        model_source_dropdown = gr.Dropdown(choices=["civitai.com", "liandange.com", "official_models", 'hugging_face', "controlnet"],
                                                             value=self.runtime.model_source,
                                                             label="Select Model Source",
                                                             type="value",
@@ -409,7 +409,7 @@ class MiaoShouAssistant(object):
         images = self.runtime.get_images_html()
         self.runtime.ds_models.samples = images
 
-        if self.runtime.model_source not in ['official_models', 'controlnet']:
+        if self.runtime.model_source not in ['official_models', 'hugging_face', 'controlnet']:
             self.runtime.update_boot_setting('model_source', self.runtime.model_source)
 
         return (
@@ -423,7 +423,7 @@ class MiaoShouAssistant(object):
         my_models = self.runtime.get_local_models('', model_type)
         self.runtime.ds_my_models.samples = my_models
 
-        if self.runtime.my_model_source not in ['official_models', 'controlnet']:
+        if self.runtime.my_model_source not in ['official_models', 'hugging_face', 'controlnet']:
             self.runtime.update_boot_setting('my_model_source', self.runtime.my_model_source)
 
         return gr.Dataset.update(samples=my_models)
