@@ -49,7 +49,8 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
             'civitai.com': os.path.join(self.ext_folder, 'configs', 'civitai_models.json'),
             'liandange.com': os.path.join(self.ext_folder, 'configs', 'liandange_models.json'),
             'official_models': os.path.join(self.ext_folder, 'configs', 'official_models.json'),
-            'controlnet': os.path.join(self.ext_folder, 'configs', 'controlnet.json'),
+            'hugging_face': os.path.join(self.ext_folder, 'configs', 'hugging_face.json'),
+            'controlnet': os.path.join(self.ext_folder, 'configs', 'controlnet.json')
         }
         self._checkboxes = {
             'Enable xFormers': '--xformers',
