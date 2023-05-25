@@ -557,6 +557,7 @@ class MiaoshouRuntime(object):
             mname, ext = os.path.splitext(model[3][0])
             button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
                             f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;{mname}&quot;, true)"><a href="javascript:void(0)">Send to Prompt</a></div>'
+
         elif model_type == 'LORA' or model_type == 'LoCon':
             mname, ext = os.path.splitext(model[3][0])
             button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
