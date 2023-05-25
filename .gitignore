@@ -18,3 +18,4 @@ configs/liandange_models.json
 configs/model_hash.json
 covers/*
 cache/*
+assets
