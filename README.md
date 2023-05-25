@@ -51,4 +51,3 @@ You can easily send these civitai prompts to txt2img/img2img/inpainting/extra
 </p>
 
 - It also allows you to find 1.5, 2.1 official models, controlnet models or different vae models.
-
