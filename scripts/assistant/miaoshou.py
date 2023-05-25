@@ -164,6 +164,7 @@ class MiaoShouAssistant(object):
                             elem_id="my_model_source").style(full_width=False)
 
                         mtypes = list(self.prelude.model_type.keys())
+                        mtypes.remove('LoCon')
                         my_model_type = gr.Radio(mtypes,
                                               show_label=False, value='Checkpoint', elem_id="my_model_type",
                                               interactive=True).style(full_width=True)

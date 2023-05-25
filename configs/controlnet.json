@@ -630,7 +630,7 @@
                         "primary": false
                     },
                     {
-                        "name": "control_v11u_sd15_tile.pth",
+                        "name": "control_v11f1e_sd15_tile.pth",
                         "id": 31,
                         "sizeKB": 1521261.130859375,
                         "type": "Model",

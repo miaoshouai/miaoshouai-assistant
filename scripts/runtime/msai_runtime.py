@@ -183,8 +183,8 @@ class MiaoshouRuntime(object):
                     model_format.append(model['type'])
 
                 if search == '' or \
-                        (model.get('name') is not None and search in model.get('name').lower()) \
-                        or (model.get('description') is not None and search in model.get('description').lower()):
+                        (model.get('name') is not None and search.lower() in model.get('name').lower()) \
+                        or (model.get('description') is not None and search.lower() in model.get('description').lower()):
 
                     if (model_type == 'All' or model_type in model.get('type')) \
                             and (self.allow_nsfw or (not self.allow_nsfw and not model.get('nsfw'))):
@@ -557,7 +557,7 @@ class MiaoshouRuntime(object):
             mname, ext = os.path.splitext(model[3][0])
             button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
                             f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;{mname}&quot;, true)"><a href="javascript:void(0)">Send to Prompt</a></div>'
-        elif model_type == 'LORA':
+        elif model_type == 'LORA' or model_type == 'LoCon':
             mname, ext = os.path.splitext(model[3][0])
             button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
                           f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;<lora:{mname}:&quot; + opts.extra_networks_default_multiplier + &quot;>&quot;, false)"><a href="javascript:void(0)">Send to Prompt</a></div>'
@@ -647,7 +647,7 @@ class MiaoshouRuntime(object):
                 soup = BeautifulSoup(f['cover'])
                 cover_link = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450').replace('width=150', 'width=450')
 
-                if f['type'] == 'LORA':
+                if f['type'] == 'LORA' or f['type'] == 'LoCon':
                     cover_fname = os.path.join(model_path, 'Lora', cover_fname)
                     model_fname = os.path.join(model_path, 'Lora', model_fname)
                 elif f['type'] == 'VAE':
@@ -718,6 +718,12 @@ class MiaoshouRuntime(object):
         for model_filename in ["civitai_models.json", "liandange_models.json"]:
             gzip_file = os.path.join(assets_folder, f"{model_filename}.gz")
             target_file = os.path.join(configs_folder, f"{model_filename}")
+
+            if not os.path.exists(gzip_file):
+                self.relocate_assets_if_needed()
+                sub_repo = git.Repo(self.prelude.assets_folder)
+                sub_repo.git.fetch(all=True)
+                sub_repo.git.reset('origin', hard=True)
 
             if update_ds or not os.path.exists(target_file):
                 with gzip.open(gzip_file, "rb") as compressed_file:

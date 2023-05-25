@@ -77,6 +77,7 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         self._ENV_EXCLUSION = ['COLAB_GPU', 'RUNPOD_POD_ID']
         self._model_type = {'Checkpoint': f'{os.path.join(shared.models_path,"Stable-diffusion")}',
                             'LORA': f'{os.path.join(shared.models_path,"Lora")}',
+                            'LoCon': f'{os.path.join(shared.models_path, "Lora")}',
                             "TextualInversion": f'{os.path.join(shared.script_path,"embeddings")}',
                             "Hypernetwork": f'{os.path.join(shared.models_path,"hypernetworks")}'
         }
