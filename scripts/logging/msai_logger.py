@@ -16,7 +16,8 @@ class Logger(metaclass=MiaoshouSingleton):
     KEY_JOB = "job"
 
     def _do_init(self, log_folder: str, disable_console_output: bool = False) -> None:
-        # Setup trace_path with empty string by default, it will be assigned with valid content if needed
+        # Setup trace_path with empty string by default, it will be assigned with
+        # valid content if needed
         self._dataset = {Logger.KEY_TRACE_PATH: ""}
 
         print(f"logs_location: {log_folder}")
