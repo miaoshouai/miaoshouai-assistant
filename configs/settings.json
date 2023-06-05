@@ -14,6 +14,6 @@
         "disable_log_console_output": true,
         "model_source": "liandange.com",
         "my_model_source": "civitai.com",
-        "openai_api": "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"
+        "openai_api": ""
     }
 }
