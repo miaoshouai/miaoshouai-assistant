@@ -19,7 +19,4 @@ configs/gpt_index.json
 configs/model_hash.json
 covers/*
 cache/*
-<<<<<<< HEAD
 assets
-=======
->>>>>>> 19d1823d451897734e81b21f925123e310001f50
