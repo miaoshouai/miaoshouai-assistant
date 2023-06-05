@@ -891,7 +891,7 @@ class MiaoshouRuntime(object):
         return gr.Markdown.update(visible=True, value=update_status), gr.Checkbox.update(visible=show_update), gr.Button.update(visible=show_update)
 
     def process_prompt(self, model, model_type, prompt: str):
-        text_replace = {'/': '|', '.': '', 'a girl': '1girl', 'a boy': '1boy', 'a women': '1women', 'a man': '1man'}
+        text_replace = {'/': '|', 'a girl': '1girl', 'a boy': '1boy', 'a women': '1women', 'a man': '1man'}
         for rep in text_replace.keys():
             prompt = prompt.strip().lower().replace(rep, text_replace[rep])
 
@@ -942,8 +942,7 @@ class MiaoshouRuntime(object):
         return generation_info
 
     def get_gpt_prompt(self, model, model_type, main_prompt):
-        if os.environ["OPENAI_API_KEY"] is None or os.environ["OPENAI_API_KEY"] == '':
-            os.environ["OPENAI_API_KEY"] = self.prelude.boot_settings['openai_api']
+        os.environ["OPENAI_API_KEY"] = self.prelude.boot_settings['openai_api']
 
         if model is None:
             return gr.TextArea.update(value='Please select a model first')
