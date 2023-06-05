@@ -8,7 +8,7 @@ from modules.call_queue import wrap_queued_call
 import launch
 import modules
 from modules import shared
-from scripts.logging.msai_logger import Logger
+from scripts.msai_logging.msai_logger import Logger
 from scripts.runtime.msai_prelude import MiaoshouPrelude
 from scripts.runtime.msai_runtime import MiaoshouRuntime
 import modules.generation_parameters_copypaste as parameters_copypaste
@@ -206,8 +206,16 @@ class MiaoShouAssistant(object):
 
                     with gr.Row(variant='panel'):
                         generation_info = gr.Textbox(label='prompt', interactive=False, visible=True, elem_id="imginfo_generation_info")
-
                     with gr.Row(variant='panel'):
+                        display_text = 'Type text here and ChatGPT will generate prompt for you. Supports different text in different languages.'
+                        display_value = ''
+                        if self.prelude.boot_settings['openai_api'] == '':
+                            display_text = 'Set your OpenAI api key in Setting & Update first: https://platform.openai.com/account/api-keys'
+                            display_value = display_text
+                        self.txt_main_prompt = gr.Textbox(label='Let ChatGPT write your prompt', placeholder=display_text, value=display_value, interactive=True, visible=True, elem_id="txt_main_prompt")
+                    with gr.Row(variant='panel'):
+                        with gr.Row():
+                            btn_generate_prompt = gr.Button(value="Use GPT to Generate Prompt")
                         with gr.Row():
                             buttons = parameters_copypaste.create_buttons(["txt2img", "img2img", "inpaint", "extras"])
 
@@ -231,6 +239,7 @@ class MiaoShouAssistant(object):
 
         btn_my_search.click(self.runtime.search_my_model, inputs=[my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
         my_model_type.change(self.runtime.update_my_model_type, inputs=[my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
+        btn_generate_prompt.click(self.runtime.get_gpt_prompt, inputs=[self.runtime.ds_my_models, my_model_type, self.txt_main_prompt], outputs=[generation_info])
 
         self.runtime.ds_my_models.click(self.runtime.get_my_model_covers,
                                      inputs=[self.runtime.ds_my_models, my_model_type],
@@ -350,14 +359,22 @@ class MiaoShouAssistant(object):
 
         tab_downloads.select(tab_downloads_select, inputs=[], outputs=[])
 
-
-
     def create_subtab_update(self) -> None:
-        with gr.TabItem('Update', elem_id="about_update") as tab_update:
+        with gr.TabItem('Setting & Update', elem_id="about_update") as tab_update:
+            with gr.Row():
+                md_api_res = gr.Markdown(visible=False)
+            with gr.Row():
+                if self.prelude.boot_settings['openai_api'] == '':
+                    display_text = 'Enter you OpenAI API Key here, you can get it from https://platform.openai.com/account/api-keys'
+                else:
+                    display_text = self.prelude.boot_settings['openai_api']
+                txt_gptapi = gr.Textbox(label='OpenAI API Key', value=display_text)
+            with gr.Row():
+                btn_update_gptapi = gr.Button(value="Update API Key")
             with gr.Row():
                 txt_update_result = gr.Markdown(visible=False)
             with gr.Row():
-                btn_check_update = gr.Button(value="Check Update")
+                btn_check_update = gr.Button(value="Check for Update")
             with gr.Row():
                 chk_dont_update_ms = gr.Checkbox(visible=False, label="Do not update model source", value=False)
                 btn_update = gr.Button(visible=False, value="Update Miaoshouai Assistant")
@@ -373,17 +390,15 @@ class MiaoShouAssistant(object):
                     Cheers~</p>
                     <p style="text-align: left;">
                         <a target="_blank" href="https://github.com/miaoshouai/miaoshouai-assistant"><img src="https://img.shields.io/github/followers/miaoshouai?style=social" style="display: inline;" alt="MiaoshouAI GitHub"/></a>
-                        <a href="https://discord.gg/S22Jgn3rtz"><img src="https://img.shields.io/discord/1086407792451129374?label=Discord" style="display: inline;" alt="Discord server"></a>|
-                        <a target="_blank" href='https://www.buymeacoffee.com/miaoshou'>【buy me coffee~ \U0001f9cb】</a>|
-                        <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=p5ZhOHAh">【QQ群：256734228】</a>|
-                        <a target="_blank" href='https://t.zsxq.com/0d6EqTqDN'>【加入异能AI研究所-知识星球】</a>|
-                        <a target="_blank" href='https://docs.qq.com/doc/DY0pVZWJUWWRHa0tM'>【其它你可能用得到的】</a>
+                        <a href="https://discord.gg/S22Jgn3rtz"><img src="https://img.shields.io/discord/1086407792451129374?label=Discord" style="display: inline;" alt="Discord server"></a>
+                        <a target="_blank" href="https://jq.qq.com/?_wv=1027&k=p5ZhOHAh">【QQ群：256734228】</a>
                     </p>
 
                     """
                 )
 
             btn_check_update.click(self.runtime.check_update, inputs=[], outputs=[txt_update_result, chk_dont_update_ms, btn_update])
+            btn_update_gptapi.click(self.runtime.update_gptapi, inputs=[txt_gptapi], outputs=[md_api_res, self.txt_main_prompt])
             btn_update.click(self.runtime.update_program, inputs=[chk_dont_update_ms], outputs=[txt_update_result])
 
     def save_cmdline_args(self, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):

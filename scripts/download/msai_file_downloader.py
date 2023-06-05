@@ -13,7 +13,7 @@ from tqdm import tqdm
 from urllib3.util import Retry
 
 import scripts.msai_utils.msai_toolkit as toolkit
-from scripts.logging.msai_logger import Logger
+from scripts.msai_logging.msai_logger import Logger
 
 
 class MiaoshouFileDownloader(object):

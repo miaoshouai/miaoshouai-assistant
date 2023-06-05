@@ -15,13 +15,16 @@ import requests
 from bs4 import BeautifulSoup
 import subprocess
 import modules
+import random
+from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
+import openai
 import json
 #import tkinter as tk
 #from tkinter import filedialog, ttk
 from modules import shared, sd_hijack
 from modules.sd_models import CheckpointInfo
 from scripts.download.msai_downloader_manager import MiaoshouDownloaderManager
-from scripts.logging.msai_logger import Logger
+from scripts.msai_logging.msai_logger import Logger
 from scripts.msai_utils import msai_toolkit as toolkit
 from scripts.runtime.msai_prelude import MiaoshouPrelude
 
@@ -886,6 +889,98 @@ class MiaoshouRuntime(object):
                 update_status = "behind"
 
         return gr.Markdown.update(visible=True, value=update_status), gr.Checkbox.update(visible=show_update), gr.Button.update(visible=show_update)
+
+    def process_prompt(self, model, model_type, prompt: str):
+        text_replace = {'/': '|', '.': '', 'a girl': '1girl', 'a boy': '1boy', 'a women': '1women', 'a man': '1man'}
+        for rep in text_replace.keys():
+            prompt = prompt.strip().lower().replace(rep, text_replace[rep])
+
+        try:
+            mid = model[1]
+            m_list = [e for e in self.my_model_set if e['id'] == mid]
+            if m_list is not None or m_list != []:
+                m = m_list[0]
+            else:
+                return prompt
+        except Exception as e:
+            self.logger.info(f"generation_info error:{str(e)}")
+            return prompt
+
+        generation_info = ''
+        for mv in m['modelVersions']:
+            img_cnt = len(mv['images'])
+            img = mv['images'][random.randint(0, img_cnt-1)]
+            if img['meta'] is not None and img['meta'] != '':
+                try:
+                    meta = img['meta']
+
+                    lora = ''
+                    if model_type == 'LORA' or model_type == 'LoCon':
+                        mname, ext = os.path.splitext(model[3][0])
+                        lora = f', <lora:{mname}:0.7>'
+
+                    tw_count = len(mv['trainedWords'])
+                    if tw_count > 0:
+                        twords = mv['trainedWords'][random.randint(0, tw_count-1)]
+                        generation_info += f"{prompt}, {twords}{lora}\n"
+                    else:
+                        generation_info += f"{prompt}{lora}\n"
+
+                    if meta['negativePrompt'] is not None:
+                        generation_info += f"Negative prompt: {meta['negativePrompt']}\n"
+                    generation_info += f"Steps: {meta['steps']}, Sampler: {meta['sampler']}, "
+                    generation_info += f"CFG scale: {meta['cfgScale']}, Seed: -1, Size: {meta['Size']},"
+                    if meta['Model hash'] is not None:
+                        generation_info += f"Model hash: {meta['Model hash']}"
+
+                except Exception as e:
+                    self.logger.info(f"generation_info error:{str(e)}")
+                    return generation_info
+
+            break
+
+        return generation_info
+
+    def get_gpt_prompt(self, model, model_type, main_prompt):
+        if model is None:
+            return gr.TextArea.update(value='Please select a model first')
+
+        index = GPTSimpleVectorIndex.load_from_disk(self.prelude.gpt_index)
+        max_tokens = 4000
+
+        try:
+            response = openai.Completion.create(
+                engine="text-davinci-003",
+                prompt=f"translate the following text into English:\n{main_prompt}",
+                max_tokens=max_tokens,
+                n=1,
+                stop=None,
+                temperature=0.5,
+            )
+            translation = response.choices[0].text.strip().replace('Translation:', '')
+            gpt_prompt = 'give me a prompt for: ' + translation
+
+            response = index.query(gpt_prompt, response_mode="compact")
+            res_prompt = self.process_prompt(model, model_type, response.response)
+        except Exception as e:
+            res_prompt = str(e)
+
+        return gr.TextArea.update(value=res_prompt)
+
+    def update_gptapi(self, apikey):
+
+        if apikey == '':
+            res = 'Please enter a valid API Key'
+            gpt_hint_text = 'Set your OpenAI api key in Setting & Update first: https://platform.openai.com/account/api-keys'
+            value_text = gpt_hint_text
+        else:
+            self.update_boot_setting('openai_api', apikey)
+            os.environ["OPENAI_API_KEY"] = apikey
+            res = 'API Key updated'
+            gpt_hint_text = 'Select a model and type some text here, ChatGPT will generate prompt for you. Supports different text in different languages.'
+            value_text = ''
+
+        return gr.Markdown.update(value=res, visible=True), gr.Textbox.update(placeholder=gpt_hint_text, value=value_text)
 
     def update_program(self, dont_update_ms=False):
         result = "Update successful, restart to take effective."

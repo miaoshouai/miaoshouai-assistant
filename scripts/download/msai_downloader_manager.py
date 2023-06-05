@@ -7,7 +7,7 @@ import typing as t
 from threading import Thread, Lock
 
 from scripts.download.msai_file_downloader import MiaoshouFileDownloader
-from scripts.logging.msai_logger import Logger
+from scripts.msai_logging.msai_logger import Logger
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
 import scripts.msai_utils.msai_toolkit as toolkit
 from urllib.request import Request, urlopen
