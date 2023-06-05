@@ -207,7 +207,7 @@ class MiaoShouAssistant(object):
                     with gr.Row(variant='panel'):
                         generation_info = gr.Textbox(label='prompt', interactive=False, visible=True, elem_id="imginfo_generation_info")
                     with gr.Row(variant='panel'):
-                        display_text = 'Type text here and ChatGPT will generate prompt for you. Supports different text in different languages.'
+                        display_text = 'Select a model and type some text here, ChatGPT will generate prompt for you. Supports different text in different languages.'
                         display_value = ''
                         if self.prelude.boot_settings['openai_api'] == '':
                             display_text = 'Set your OpenAI api key in Setting & Update first: https://platform.openai.com/account/api-keys'

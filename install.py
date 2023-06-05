@@ -9,7 +9,7 @@ def install_preset_models_if_needed():
     assets_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
     configs_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "configs")
 
-    for model_filename in ["civitai_models.json", "liandange_models.json"]:
+    for model_filename in ["civitai_models.json", "liandange_models.json", "gpt_index.json"]:
         gzip_file = os.path.join(assets_folder, f"{model_filename}.gz")
         target_file = os.path.join(configs_folder, f"{model_filename}")
         if not os.path.exists(target_file):

@@ -719,7 +719,7 @@ class MiaoshouRuntime(object):
         assets_folder = os.path.join(self.prelude.ext_folder, "assets")
         configs_folder = os.path.join(self.prelude.ext_folder, "configs")
 
-        for model_filename in ["civitai_models.json", "liandange_models.json"]:
+        for model_filename in ["civitai_models.json", "liandange_models.json", "gpt_index.json"]:
             gzip_file = os.path.join(assets_folder, f"{model_filename}.gz")
             target_file = os.path.join(configs_folder, f"{model_filename}")
 
@@ -944,6 +944,9 @@ class MiaoshouRuntime(object):
     def get_gpt_prompt(self, model, model_type, main_prompt):
         if model is None:
             return gr.TextArea.update(value='Please select a model first')
+
+        if not os.path.exists(self.prelude.gpt_index):
+            self.install_preset_models_if_needed(True)
 
         index = GPTSimpleVectorIndex.load_from_disk(self.prelude.gpt_index)
         max_tokens = 4000
