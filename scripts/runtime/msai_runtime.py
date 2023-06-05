@@ -942,6 +942,9 @@ class MiaoshouRuntime(object):
         return generation_info
 
     def get_gpt_prompt(self, model, model_type, main_prompt):
+        if os.environ["OPENAI_API_KEY"] is None or os.environ["OPENAI_API_KEY"] == '':
+            os.environ["OPENAI_API_KEY"] = self.prelude.boot_settings['openai_api']
+
         if model is None:
             return gr.TextArea.update(value='Please select a model first')
 
@@ -960,13 +963,14 @@ class MiaoshouRuntime(object):
                 stop=None,
                 temperature=0.5,
             )
-            translation = response.choices[0].text.strip().replace('Translation:', '')
-            gpt_prompt = 'give me a prompt for: ' + translation
+            res_prompt = response.choices[0].text.strip().replace('Translation:', '')
+            gpt_prompt = 'give me a prompt for: ' + res_prompt
 
             response = index.query(gpt_prompt, response_mode="compact")
             res_prompt = self.process_prompt(model, model_type, response.response)
         except Exception as e:
             res_prompt = str(e)
+            return gr.TextArea.update(value=res_prompt)
 
         return gr.TextArea.update(value=res_prompt)
 
