@@ -4,8 +4,10 @@
 
 MiaoshouAI Assistant for [Automatic1111 WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
-1.2 Release: add support for model search. Allow model to load directly from model management. Now you can update model source directly under update tab.
-1.1 Release: add support for Lora, embedding and hypernetwork models under model manangement. bug fixes.
+1.4 Add new feature for using GPT to generate prompts. Fixed sub folder support for model management</br>
+1.3 Add support for LyCoris(just put them in the lora folder, <a herf="">LyCoris extension</a> is needed.); Cleanup work for git to reduce project size</br>
+1.2 Add support for model search. Allow model to load directly from model management. Now you can update model source directly under update tab.</br>
+1.1 Add support for Lora, embedding and hypernetwork models under model manangement. bug fixes.
 
 ### Installation
 In Automatic1111 WebUI, go to `Extensions Tab`->`Install from URL`, copy the following address in "**URL for extension's git repository**".

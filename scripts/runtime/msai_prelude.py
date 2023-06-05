@@ -8,7 +8,7 @@ import torch
 
 import launch
 from modules import shared
-from scripts.logging.msai_logger import Logger
+from scripts.msai_logging.msai_logger import Logger
 from scripts.msai_utils import msai_toolkit as toolkit
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
 import modules
@@ -41,6 +41,7 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         self._ext_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
         self._setting_file = os.path.join(self.ext_folder, "configs", "settings.json")
         self._model_hash_file = os.path.join(self.ext_folder, "configs", "model_hash.json")
+        self._gpt_index = os.path.join(self.ext_folder, "configs", "gpt_index.json")
         self._assets_folder = os.path.join(self.ext_folder, "assets")
         self._cache_folder = os.path.join(self.ext_folder, "cache")
         self._cover_folder = os.path.join(self.ext_folder, "covers")
@@ -82,6 +83,8 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
                             "Hypernetwork": f'{os.path.join(shared.models_path,"hypernetworks")}'
         }
 
+        self._gpt_type = ['gpt-3.5-turbo', 'text-davinci-003']
+
     @property
     def ext_folder(self) -> str:
         return self._ext_folder
@@ -118,6 +121,10 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         return self._model_hash_file
 
     @property
+    def gpt_index(self) -> str:
+        return self._gpt_index
+
+    @property
     def cache_folder(self) -> str:
         return self._cache_folder
 
@@ -148,6 +155,10 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
     @property
     def model_type(self) -> t.Dict[str, str]:
         return self._model_type
+
+    @property
+    def gpt_type(self) -> t.Dict[str, str]:
+        return self._gpt_type
 
     @property
     def model_json(self) -> t.Dict[str, t.Any]:

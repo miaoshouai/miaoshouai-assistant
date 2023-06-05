@@ -9,10 +9,11 @@
         "Enable API": "--api",
         "Auto Launch": "--autolaunch",
         "Allow Local Network Access": "False",
-        "drp_choose_version": "Python Integrated",
-        "txt_args_more": "--theme dark",
+        "drp_choose_version": "Official Release",
+        "txt_args_more": "",
         "disable_log_console_output": true,
-        "model_source": "civitai.com",
-        "my_model_source": "civitai.com"
+        "model_source": "liandange.com",
+        "my_model_source": "civitai.com",
+        "openai_api": "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"
     }
 }

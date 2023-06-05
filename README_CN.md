@@ -3,8 +3,10 @@
 
 喵手助理 [Automatic1111 WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
-1.2 版更新：增加了模型搜索功能，可以直接在模型管理下load模型，增加了插件和模型源更新功能。
-1.1 版更新: 模型管理下增加了对Lora, embedding and hypernetwork等模型的支持。修复了启动时与秋叶启动器的冲突。
+1.4 添加了使用GPT来生成咒语的功能; 修复了模型管理中对子文件夹的支持。
+1.3 增加了模型下载和管理功能中对LyCoris的支持(你需要将LoCoris模型放置在Lora目录下, 需要安装<a herf="https://github.com/KohakuBlueleaf/a1111-sd-webui-lycoris"> LyCoris插件 </a>)</br>
+1.2 增加了模型搜索功能，可以直接在模型管理下load模型，增加了插件和模型源更新功能。</br>
+1.1 模型管理下增加了对Lora, embedding and hypernetwork等模型的支持。修复了启动时与秋叶启动器的冲突。
 
 ### 安装
 在 Automatic1111 WebUI 中，前往 `扩展插件`-> `从URL安装`，在`扩展插件的git仓库网址`中复制以下地址。
