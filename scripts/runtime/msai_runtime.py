@@ -272,6 +272,7 @@ class MiaoshouRuntime(object):
         for root, dirs, files in os.walk(self.prelude.model_type[model_type]):
             for file in files:
                 mpath = os.path.join(root, file)
+
                 fname, ext = os.path.splitext(file)
                 if ext in ['.ckpt', '.safetensors', '.pt'] and file != 'scaler.pt' and (search_txt in fname or search_txt == ''):
                     chkpt_info = modules.sd_models.get_closet_checkpoint_match(file)
@@ -293,7 +294,7 @@ class MiaoshouRuntime(object):
                             self.prelude.no_preview_img,
                             0,
                             [os.path.basename(fname)],
-                            [str(file).replace(self.prelude.model_type[model_type]+'\\', '')]])
+                            [mpath.replace(self.prelude.model_type[model_type]+'\\', '')]])
 
         return models
 
@@ -335,6 +336,8 @@ class MiaoshouRuntime(object):
         lookup_sha256 = chkpt_info.sha256
         lookup_shash = chkpt_info.shorthash
         fname = re.sub(r'\[.*?\]', "", chkpt_info.title)
+        if '\\' in fname:
+            fname = fname.split('\\')[-1]
 
         self.logger.info(f"lookup_sha256: {lookup_sha256}, lookup_shash: {lookup_shash}, fname: {fname}")
 
@@ -385,6 +388,7 @@ class MiaoshouRuntime(object):
 
                     if match:
                         mid = model['id']
+
                         res = [
                             dst,
                             mid,
