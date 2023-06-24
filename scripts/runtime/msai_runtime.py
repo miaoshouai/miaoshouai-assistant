@@ -166,7 +166,7 @@ class MiaoshouRuntime(object):
         else:
             self.logger.error(f"ds models is null")
 
-    def get_images_html(self, search: str = '', model_type: str = 'All') -> t.List[str]:
+    def get_images_html(self, search: str = '', chk_nsfw: bool = False, model_type: str = 'All') -> t.List[str]:
         self.logger.info(f"get_image_html: model_type = {model_type}, and search pattern = '{search}'")
 
         model_cover_thumbnails = []
@@ -189,13 +189,14 @@ class MiaoshouRuntime(object):
                         (model.get('name') is not None and search.lower() in model.get('name').lower()) \
                         or (model.get('description') is not None and search.lower() in model.get('description').lower()):
 
+                    self._allow_nsfw = chk_nsfw
                     if (model_type == 'All' or model_type in model.get('type')) \
                             and (self.allow_nsfw or (not self.allow_nsfw and not model.get('nsfw'))):
                         model_cover_thumbnails.append([
                             [f"""
                                 <div style="display: flex; align-items: center;">
                                     <div id="{str(model.get('id'))}" style="margin-right: 10px;" class="model-item">
-                                        <img src="{model['modelVersions'][0]['images'][0]['url'].replace('width=450', 'width=100')}" style="width:100px;">
+                                        <img referrerpolicy="no-referrer" src="{model['modelVersions'][0]['images'][0]['url'].replace('width=450', 'width=100')}" style="width:100px;">
                                     </div>
                                     <div style="flex:1; width:100px;">
                                         <h3 style="text-align:left; word-wrap:break-word;">{model.get('name')}</h3>
@@ -316,6 +317,35 @@ class MiaoshouRuntime(object):
 
         return gr.Dataset.update(samples=my_models)
 
+    def set_all_covers(self, search_txt, model_type):
+        for model in self.ds_my_models.samples:
+            try:
+                if model[0] == self.prelude.no_preview_img and model[1] != 0:
+                    img_list, l1, htmlDetail, h2 = self.get_model_info(model)
+                    soup = BeautifulSoup(img_list[0][0])
+                    cover_url = soup.findAll('img')[0]['src'].replace('width=150', 'width=450')
+
+                    fname = model[3][0]
+                    mname, ext = os.path.splitext(fname)
+                    mfolder = self.prelude.model_type[model_type]
+                    dst = os.path.join(mfolder, f'{mname}.jpg')
+
+                    if fname is not None and not os.path.exists(dst):
+                        if self.my_model_source == 'liandange.com':
+                            cover_url = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450')
+                        r = requests.get(cover_url, timeout=30, stream=True)
+                        r.raw.decode_content = True
+                        with open(dst, 'wb') as f:
+                            shutil.copyfileobj(r.raw, f)
+            except Exception as e:
+                print(model[1], cover_url, dst, str(e))
+                continue
+
+        my_models = self.get_local_models(search_txt, model_type)
+        self.ds_my_models.samples = my_models
+
+        return gr.Dataset.update(samples=my_models)
+
     def set_cover(self, model, cover, search_txt, model_type):
         fname = model[3][0]
         mname, ext = os.path.splitext(fname)
@@ -418,12 +448,12 @@ class MiaoshouRuntime(object):
         self._ds_models.samples = new_list
         return self._ds_models.update(samples=new_list)
 
-    def search_model(self, search='', model_type='All') -> t.Dict:
+    def search_model(self, search='', chk_nsfw=False, model_type='All') -> t.Dict:
         if self._ds_models is None:
             self.logger.error(f"_ds_models is not initialized")
             return {}
 
-        new_list = self.get_images_html(search, model_type)
+        new_list = self.get_images_html(search, chk_nsfw, model_type)
 
         self._ds_models.samples = new_list
         return self._ds_models.update(samples=new_list)
@@ -438,6 +468,14 @@ class MiaoshouRuntime(object):
         self._ds_my_models.samples = new_list
         return self._ds_my_models.update(samples=new_list)
 
+    def get_model_byid(self, mid, model_source) -> t.List:
+        response = requests.get(self.prelude.api_url(model_source) + f'/{mid}')
+        payload = response.json()
+        if payload.get("success") is not None and not payload.get("success"):
+            return []
+
+        return [payload]
+
     def get_model_info(self, models) -> t.Tuple[t.List[t.List[str]], t.Dict, str, t.Dict]:
         drop_list = []
         cover_imgs = []
@@ -447,9 +485,16 @@ class MiaoshouRuntime(object):
 
         # TODO: use map to enhance the performances
         if self.active_model_set == 'model_set':
-            m_list = [e for e in self.model_set if e['id'] == mid]
+            if self.model_source == "civitai.com" or self.model_source == "liandange.com":
+                m_list = self.get_model_byid(mid, self.model_source)
+            else:
+                m_list = [e for e in self.model_set if e['id'] == mid]
         else:
-            m_list = [e for e in self.my_model_set if e['id'] == mid]
+            if self.my_model_source == "civitai.com" or self.my_model_source == "liandange.com":
+                m_list = self.get_model_byid(mid, self.my_model_source)
+                self._allow_nsfw = True
+            else:
+                m_list = [e for e in self.my_model_set if e['id'] == mid]
 
         if m_list is not None and len(m_list) > 0:
             m = m_list[0]
@@ -466,7 +511,7 @@ class MiaoshouRuntime(object):
                 for img in latest_version['images']:
                     if self.allow_nsfw or (not self.allow_nsfw and (not img.get('nsfw') or img.get('nsfw') in ['None', 'Soft'])):
                         if img.get('url'):
-                            cover_imgs.append([f'<img src="{img["url"].replace("width=450","width=150").replace("/w/100", "/w/150")}" style="width:150px;">'])
+                            cover_imgs.append([f'<img referrerpolicy="no-referrer" src="{img["url"].replace("width=450","width=150").replace("/w/100", "/w/150")}" style="width:150px;">'])
 
             if latest_version.get('files') and isinstance(latest_version.get('files'), list):
                 for file in latest_version['files']:
@@ -565,10 +610,14 @@ class MiaoshouRuntime(object):
             button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
                             f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;{mname}&quot;, true)"><a href="javascript:void(0)">Send to Prompt</a></div>'
 
-        elif model_type == 'LORA' or model_type == 'LoCon':
+        elif model_type == 'LORA':
             mname, ext = os.path.splitext(model[3][0])
             button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
                           f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;<lora:{mname}:&quot; + opts.extra_networks_default_multiplier + &quot;>&quot;, false)"><a href="javascript:void(0)">Send to Prompt</a></div>'
+        elif model_type.upper() == 'LoCon'.upper():
+            mname, ext = os.path.splitext(model[3][0])
+            button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
+                          f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;<lyco:{mname}:&quot; + opts.extra_networks_default_multiplier + &quot;>&quot;, false)"><a href="javascript:void(0)">Send to Prompt</a></div>'
         else:
             mpath = os.path.join(self.prelude.model_type[model_type], model[3][0])
             checkpoint_info = CheckpointInfo(mpath)
@@ -589,7 +638,7 @@ class MiaoshouRuntime(object):
             return []
 
         mid = model[1]
-        m_list = [e for e in self.my_model_set if e['id'] == mid]
+        m_list = self.get_model_byid(mid, self.my_model_source)
         if m_list is not None or m_list != []:
             m = m_list[0]
         else:
@@ -655,9 +704,12 @@ class MiaoshouRuntime(object):
                 soup = BeautifulSoup(f['cover'])
                 cover_link = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450').replace('width=150', 'width=450')
 
-                if f['type'] == 'LORA' or f['type'] == 'LoCon':
+                if f['type'] == 'LORA':
                     cover_fname = os.path.join(model_path, 'Lora', cover_fname)
                     model_fname = os.path.join(model_path, 'Lora', model_fname)
+                elif f['type'].upper() == 'LoCon'.upper():
+                    cover_fname = os.path.join(model_path, 'LyCORIS', cover_fname)
+                    model_fname = os.path.join(model_path, 'LyCORIS', model_fname)
                 elif f['type'] == 'VAE':
                     cover_fname = os.path.join(model_path, 'VAE', cover_fname)
                     model_fname = os.path.join(model_path, 'VAE', model_fname)
@@ -901,7 +953,7 @@ class MiaoshouRuntime(object):
 
         try:
             mid = model[1]
-            m_list = [e for e in self.my_model_set if e['id'] == mid]
+            m_list = self.get_model_byid(mid, self.my_model_source)
             if m_list is not None or m_list != []:
                 m = m_list[0]
             else:
@@ -919,9 +971,12 @@ class MiaoshouRuntime(object):
                     meta = img['meta']
 
                     lora = ''
-                    if model_type == 'LORA' or model_type == 'LoCon':
+                    if model_type == 'LORA':
                         mname, ext = os.path.splitext(model[3][0])
                         lora = f', <lora:{mname}:0.7>'
+                    elif model_type.upper() == 'LoCon'.upper():
+                        mname, ext = os.path.splitext(model[3][0])
+                        lora = f', <lyco:{mname}:0.7>'
 
                     tw_count = len(mv['trainedWords'])
                     if tw_count > 0:

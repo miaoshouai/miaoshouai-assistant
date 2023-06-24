@@ -35,8 +35,8 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
 
     def _init_constants(self) -> None:
         self._api_url = {
-            "civitai.com": "https://civitai.com/api/v1/models",
-            "liandange.com": "http://model-api.liandange.com/model/api/models",
+            "civitai.com": "https://model-share.com/v1/models",
+            "liandange.com": "https://model-api.liandange.com/model/api/models",
         }
         self._ext_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
         self._setting_file = os.path.join(self.ext_folder, "configs", "settings.json")
@@ -78,7 +78,7 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         self._ENV_EXCLUSION = ['COLAB_GPU', 'RUNPOD_POD_ID']
         self._model_type = {'Checkpoint': f'{os.path.join(shared.models_path,"Stable-diffusion")}',
                             'LORA': f'{os.path.join(shared.models_path,"Lora")}',
-                            'LoCon': f'{os.path.join(shared.models_path, "Lora")}',
+                            'LoCon': f'{os.path.join(shared.models_path, "LyCORIS")}',
                             "TextualInversion": f'{os.path.join(shared.script_path,"embeddings")}',
                             "Hypernetwork": f'{os.path.join(shared.models_path,"hypernetworks")}'
         }
