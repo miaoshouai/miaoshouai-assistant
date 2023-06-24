@@ -1,0 +1,19 @@
+{
+    "boot_settings": {
+        "drp_args_vram": "CPU Only",
+        "drp_args_theme": "Dark Mode",
+        "txt_args_listen_port": "7860",
+        "Enable xFormers": "--xformers",
+        "No Half": "--no-half",
+        "No Half VAE": "False",
+        "Enable API": "--api",
+        "Auto Launch": "--autolaunch",
+        "Allow Local Network Access": "False",
+        "drp_choose_version": "Official Release",
+        "txt_args_more": "",
+        "disable_log_console_output": true,
+        "model_source": "liandange.com",
+        "my_model_source": "civitai.com",
+        "openai_api": "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"
+    }
+}

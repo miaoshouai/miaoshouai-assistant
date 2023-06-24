@@ -1,0 +1,198 @@
+[
+    {
+        "id": 1,
+        "name": "Negative Embeddings",
+        "description": "<p>This is a collection of negative embeddings for Stable Diffusion negative prompts</p>",
+        "type": "TextualInversion",
+        "poi": false,
+        "nsfw": false,
+        "allowNoCredit": true,
+        "allowCommercialUse": "Rent",
+        "allowDerivatives": true,
+        "allowDifferentLicense": true,
+        "stats": {
+            "downloadCount": 865,
+            "favoriteCount": 190,
+            "commentCount": 7,
+            "ratingCount": 2,
+            "rating": 5
+        },
+        "creator": {
+            "username": "multiple authors",
+            "image": ""
+        },
+        "tags": [],
+        "modelVersions": [
+            {
+                "id": 1,
+                "modelId": 7019,
+                "name": "Controlnet 1.0",
+                "createdAt": "2023-02-06T13:52:34.605Z",
+                "updatedAt": "2023-02-06T13:52:34.605Z",
+                "trainedWords": [],
+                "baseModel": "SD 1.5",
+                "earlyAccessTimeFrame": 0,
+                "description": "<p></p>",
+                "files": [
+                    {
+                        "name": "EasyNegative.safetensors",
+                        "id": 1,
+                        "sizeKB": 25261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/datasets/gsdf/EasyNegative/resolve/main/EasyNegative.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "EasyNegativeV2.safetensors",
+                        "id": 2,
+                        "sizeKB": 50261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/gsdf/Counterfeit-V3.0/resolve/main/embedding/EasyNegativeV2.safetensors",
+                        "primary": true
+                    },
+                    {
+                        "name": "bad-hands-5.pt",
+                        "id": 3,
+                        "sizeKB": 7261.130859375,
+                        "type": "Model",
+                        "format": "Pth",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/yesyeahvh/bad-hands-5/resolve/main/bad-hands-5.pt",
+                        "primary": false
+                    },
+                    {
+                        "name": "bad_prompt.pt",
+                        "id": 4,
+                        "sizeKB": 51261.130859375,
+                        "type": "Model",
+                        "format": "Pth",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/datasets/Nerfgun3/bad_prompt/blob/main/bad_prompt.pt",
+                        "primary": false
+                    },
+                    {
+                        "name": "bad_prompt_version2.pt",
+                        "id": 5,
+                        "sizeKB": 25261.130859375,
+                        "type": "Model",
+                        "format": "Pth",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/datasets/Nerfgun3/bad_prompt/resolve/main/bad_prompt_version2.pt",
+                        "primary": false
+                    },
+                    {
+                        "name": "badquality.pt",
+                        "id": 6,
+                        "sizeKB": 34261.130859375,
+                        "type": "Model",
+                        "format": "Pth",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/p1atdev/badquality/resolve/main/badquality.pt",
+                        "primary": false
+                    },
+                    {
+                        "name": "bad-artist-anime.pt",
+                        "id": 7,
+                        "sizeKB": 7261.130859375,
+                        "type": "Model",
+                        "format": "Pth",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/nick-x-hacker/bad-artist/resolve/main/bad-artist-anime.pt",
+                        "primary": false
+                    },
+                    {
+                        "name": "bad-artist.pt",
+                        "id": 8,
+                        "sizeKB": 7261.130859375,
+                        "type": "Model",
+                        "format": "Pth",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/nick-x-hacker/bad-artist/resolve/main/bad-artist.pt",
+                        "primary": false
+                    }
+                ],
+                "images": [
+                    {
+                        "url": "https://msdn.miaoshouai.com/msai/kt/ez/9900922.png"
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -1,0 +1,474 @@
+[
+    {
+        "id": 1,
+        "name": "stable-diffusion-v1-5",
+        "description": "<p>Stable Diffusion is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input. For more information about how Stable Diffusion functions, please have a look at \uD83E\uDD17's Stable Diffusion blog.\n\nThe Stable-Diffusion-v1-5 checkpoint was initialized with the weights of the Stable-Diffusion-v1-2 checkpoint and subsequently fine-tuned on 595k steps at resolution 512x512 on \"laion-aesthetics v2 5+\" and 10% dropping of the text-conditioning to improve classifier-free guidance sampling.\n\nYou can use this both with the \uD83E\uDDE8Diffusers library and the RunwayML GitHub repository.</p></li></ol>",
+        "type": "Checkpoint",
+        "poi": false,
+        "nsfw": false,
+        "allowNoCredit": true,
+        "allowCommercialUse": "Rent",
+        "allowDerivatives": true,
+        "allowDifferentLicense": true,
+        "stats": {
+            "downloadCount": 865,
+            "favoriteCount": 190,
+            "commentCount": 7,
+            "ratingCount": 2,
+            "rating": 5
+        },
+        "creator": {
+            "username": "creativeml-openrail-m",
+            "image": "https://huggingface.co/runwayml/stable-diffusion-v1-5"
+        },
+        "tags": [
+            "horror",
+            "dzislaw beksinskidzi",
+            "kappa_neuro",
+            "paintings"
+        ],
+        "modelVersions": [
+            {
+                "id": 1,
+                "modelId": 7019,
+                "name": "Zdzislaw Beksinski LORA",
+                "createdAt": "2023-02-06T13:52:34.605Z",
+                "updatedAt": "2023-02-06T13:52:34.605Z",
+                "trainedWords": [],
+                "baseModel": "SD 1.5",
+                "earlyAccessTimeFrame": 0,
+                "description": "<p></p>",
+                "files": [
+                    {
+                        "name": "v1-5-pruned-emaonly.ckpt",
+                        "id": 1,
+                        "sizeKB": 4471261.130859375,
+                        "type": "Model",
+                        "format": "CKPT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.ckpt",
+                        "primary": false
+                    },
+                    {
+                        "name": "v1-5-pruned-emaonly.safetensors",
+                        "id": 2,
+                        "sizeKB": 4471261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors",
+                        "primary": true
+                    },
+                    {
+                        "name": "v1-5-pruned.ckpt",
+                        "id": 3,
+                        "sizeKB": 7971261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned.ckpt",
+                        "primary": false
+                    },
+                    {
+                        "name": "v1-5-pruned.safetensors",
+                        "id": 4,
+                        "sizeKB": 7971261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "sd-v1-5-inpainting.ckpt",
+                        "id": 5,
+                        "sizeKB": 4471261.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-inpainting/resolve/main/sd-v1-5-inpainting.ckpt",
+                        "primary": false
+                    }
+                ],
+                "images": [
+                    {
+                        "url": "https://msdn.miaoshouai.com/msai/kt/ez/9900922.png"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "stable-diffusion-2-1",
+        "description": "<p>Stable Diffusion v2-1 Model Card\nThis model card focuses on the model associated with the Stable Diffusion v2-1 model, codebase available here.\n\nThis stable-diffusion-2-1 model is fine-tuned from stable-diffusion-2 (768-v-ema.ckpt) with an additional 55k steps on the same dataset (with punsafe=0.1), and then fine-tuned for another 155k extra steps with punsafe=0.98.\n\nUse it with the stablediffusion repository: download the v2-1_768-ema-pruned.ckpt here.\nUse it with \uD83E\uDDE8 diffusers\nModel Details\nDeveloped by: Robin Rombach, Patrick Esser\n\nModel type: Diffusion-based text-to-image generation model\n\nLanguage(s): English\n\nLicense: CreativeML Open RAIL++-M License\n\nModel Description: This is a model that can be used to generate and modify images based on text prompts. It is a Latent Diffusion Model that uses a fixed, pretrained text encoder (OpenCLIP-ViT/H).\n\nResources for more information: GitHub Repository.</p></li></ol>",
+        "type": "Checkpoint",
+        "poi": false,
+        "nsfw": false,
+        "allowNoCredit": true,
+        "allowCommercialUse": "Rent",
+        "allowDerivatives": true,
+        "allowDifferentLicense": true,
+        "stats": {
+            "downloadCount": 865,
+            "favoriteCount": 190,
+            "commentCount": 7,
+            "ratingCount": 2,
+            "rating": 5
+        },
+        "creator": {
+            "username": "stabilityai",
+            "image": "https://huggingface.co/stabilityai/stable-diffusion-2-1"
+        },
+        "tags": [],
+        "modelVersions": [
+            {
+                "id": 2,
+                "modelId": 2,
+                "name": "stable-diffusion-2-1",
+                "createdAt": "2023-02-06T13:52:34.605Z",
+                "updatedAt": "2023-02-06T13:52:34.605Z",
+                "trainedWords": [],
+                "baseModel": "SD 1.5",
+                "earlyAccessTimeFrame": 0,
+                "description": "<p></p>",
+                "files": [
+                    {
+                        "name": "v2-1_768-ema-pruned.ckpt",
+                        "id": 6,
+                        "sizeKB": 5421261.130859375,
+                        "type": "Model",
+                        "format": "CKPT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.ckpt",
+                        "primary": false
+                    },
+                    {
+                        "name": "v2-1_768-ema-pruned.safetensors",
+                        "id": 7,
+                        "sizeKB": 5421261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors",
+                        "primary": true
+                    },
+                    {
+                        "name": "v2-1_768-nonema-pruned.ckpt",
+                        "id": 8,
+                        "sizeKB": 5421261.130859375,
+                        "type": "Model",
+                        "format": "CKPT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned.ckpt",
+                        "primary": false
+                    },
+                    {
+                        "name": "v2-1_768-nonema-pruned.safetensors",
+                        "id": 9,
+                        "sizeKB": 5421261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "512-inpainting-ema.ckpt",
+                        "id": 10,
+                        "sizeKB": 5421261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/stabilityai/stable-diffusion-2-inpainting/resolve/main/512-inpainting-ema.ckpt",
+                        "primary": false
+                    },
+                    {
+                        "name": "512-inpainting-ema.safetensors",
+                        "id": 11,
+                        "sizeKB": 5421261.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/stabilityai/stable-diffusion-2-inpainting/resolve/main/512-inpainting-ema.safetensors",
+                        "primary": false
+                    },
+                    {
+                        "name": "v2-1_768-ema-pruned.yaml",
+                        "id": 12,
+                        "sizeKB": 2261.130859375,
+                        "type": "Model",
+                        "format": "YAML",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://raw.githubusercontent.com/Stability-AI/stablediffusion/main/configs/stable-diffusion/v2-inference-v.yaml",
+                        "primary": false
+                    }
+                ],
+                "images": [
+                    {
+                        "url": "https://msdn.miaoshouai.com/msai/kt/ez/9900922.png"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "name": "VAE",
+        "description": "<p>Stable Diffusion is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input. For more information about how Stable Diffusion functions, please have a look at \uD83E\uDD17's Stable Diffusion blog.\n\nThe Stable-Diffusion-v1-5 checkpoint was initialized with the weights of the Stable-Diffusion-v1-2 checkpoint and subsequently fine-tuned on 595k steps at resolution 512x512 on \"laion-aesthetics v2 5+\" and 10% dropping of the text-conditioning to improve classifier-free guidance sampling.\n\nYou can use this both with the \uD83E\uDDE8Diffusers library and the RunwayML GitHub repository.</p></li></ol>",
+        "type": "VAE",
+        "poi": false,
+        "nsfw": false,
+        "allowNoCredit": true,
+        "allowCommercialUse": "Rent",
+        "allowDerivatives": true,
+        "allowDifferentLicense": true,
+        "stats": {
+            "downloadCount": 865,
+            "favoriteCount": 190,
+            "commentCount": 7,
+            "ratingCount": 2,
+            "rating": 5
+        },
+        "creator": {
+            "username": "creativeml-openrail-m",
+            "image": "https://huggingface.co/runwayml/stable-diffusion-v1-5"
+        },
+        "tags": [],
+        "modelVersions": [
+            {
+                "id": 3,
+                "modelId": 3,
+                "name": "VAE",
+                "createdAt": "2023-02-06T13:52:34.605Z",
+                "updatedAt": "2023-02-06T13:52:34.605Z",
+                "trainedWords": [],
+                "baseModel": "SD 1.5",
+                "earlyAccessTimeFrame": 0,
+                "description": "<p></p>",
+                "files": [
+                    {
+                        "name": "vae-ft-ema-560000-ema-pruned.ckpt",
+                        "id": 15,
+                        "sizeKB": 447126.130859375,
+                        "type": "Model",
+                        "format": "CKPT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/stabilityai/sd-vae-ft-ema-original/resolve/main/vae-ft-ema-560000-ema-pruned.ckpt",
+                        "primary": false
+                    },
+                    {
+                        "name": "vae-ft-mse-840000-ema-pruned.ckpt",
+                        "id": 16,
+                        "sizeKB": 447126.130859375,
+                        "type": "Model",
+                        "format": "CKPT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/stabilityai/sd-vae-ft-mse-original/resolve/main/vae-ft-mse-840000-ema-pruned.ckpt",
+                        "primary": true
+                    },
+                    {
+                        "name": "Waifu-diffusion-v1-4 VAE",
+                        "id": 17,
+                        "sizeKB": 497126.130859375,
+                        "type": "Model",
+                        "format": "CKPT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "SHA256": "DF3C506E51B7EE1D7B5A6A2BB7142D47D488743C96AA778AFB0F53A2CDC2D38D"
+                        },
+                        "downloadUrl": "https://huggingface.co/hakurei/waifu-diffusion-v1-4/resolve/main/vae/kl-f8-anime2.ckpt",
+                        "primary": false
+                    },
+                    {
+                        "name": "autoencoder_fix_kl-f8-trinart_chara",
+                        "id": 18,
+                        "sizeKB": 447126.130859375,
+                        "type": "Model",
+                        "format": "CKPT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "833E816807",
+                            "SHA256": "833E816807E8D3658EBC65436908F690603A8E0E8D26143A90050F32958C9E4E",
+                            "CRC32": "87F68C12",
+                            "BLAKE3": "7A28D3D22520D61B58338791522A14B7B33A6A9CE552FF7D68D7E2688CAB3266"
+                        },
+                        "downloadUrl": "https://huggingface.co/naclbit/trinart_characters_19.2m_stable_diffusion_v1/resolve/main/autoencoder_fix_kl-f8-trinart_characters.ckpt",
+                        "primary": false
+                    },
+                    {
+                        "name": "Anything-V3.0.vae.pt",
+                        "id": 19,
+                        "sizeKB": 847126.130859375,
+                        "type": "Model",
+                        "format": "PT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "F921FB3F29",
+                            "SHA256": "F921FB3F29891D2A77A6571E56B8B5052420D2884129517A333C60B1B4816CDF"
+                        },
+                        "downloadUrl": "https://huggingface.co/Linaqruf/anything-v3.0/resolve/refs%2Fpr%2F11/Anything-V3.0.vae.pt",
+                        "primary": false
+                    },
+                    {
+                        "name": "Berrymix VAE",
+                        "id": 20,
+                        "sizeKB": 447126.130859375,
+                        "type": "Model",
+                        "format": "Checkpoint",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "F921FB3F29",
+                            "SHA256": "F921FB3F29891D2A77A6571E56B8B5052420D2884129517A333C60B1B4816CDF"
+                        },
+                        "downloadUrl": "https://huggingface.co/hakurei/waifu-diffusion-v1-4/resolve/main/vae/kl-f8-anime2.ckpt",
+                        "primary": false
+                    }
+                ],
+                "images": [
+                    {
+                        "url": "https://msdn.miaoshouai.com/msai/kt/ez/9900922.png"
+                    }
+                ]
+            }
+        ]
+    }
+]
