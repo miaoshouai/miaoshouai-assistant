@@ -164,7 +164,6 @@ class MiaoShouAssistant(object):
                             elem_id="my_model_source").style(full_width=False)
 
                         mtypes = list(self.prelude.model_type.keys())
-                        mtypes.remove('LoCon')
                         my_model_type = gr.Radio(mtypes,
                                               show_label=False, value='Checkpoint', elem_id="my_model_type",
                                               interactive=True).style(full_width=True)
@@ -202,7 +201,10 @@ class MiaoShouAssistant(object):
                         with gr.Column():
                             btn_delete_model = gr.Button(visible=True, value='Delete Model')
                         with gr.Column():
-                            btn_set_cover = gr.Button(visible=False, value='Set as Cover')
+                            with gr.Row():
+                                btn_set_all_covers = gr.Button(visible=True, value='Download Cover for Listed Models')
+                            with gr.Row():
+                                btn_set_cover = gr.Button(visible=False, value='Set as Cover')
 
                     with gr.Row(variant='panel'):
                         generation_info = gr.Textbox(label='prompt', interactive=False, visible=True, elem_id="imginfo_generation_info")
@@ -229,6 +231,7 @@ class MiaoShouAssistant(object):
                         html_my_model = gr.HTML(visible=False)
 
         btn_delete_model.click(self.runtime.delete_model, inputs=[self.runtime.ds_my_models, my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
+        btn_set_all_covers.click(self.runtime.set_all_covers, inputs=[my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
         btn_set_cover.click(self.runtime.set_cover, inputs=[self.runtime.ds_my_models, c_image, my_search_text, my_model_type], outputs=[self.runtime.ds_my_models])
         #open_folder_button.click(self.runtime.open_folder, inputs=[model_folder_path], outputs=[model_folder_path])
         btn_connect_modeldir.click(self.runtime.change_model_folder, inputs=[model_folder_path], outputs=[md_result])
@@ -332,11 +335,11 @@ class MiaoShouAssistant(object):
         nsfw_checker.change(self.runtime.set_nsfw, inputs=[search_text, nsfw_checker, model_type],
                             outputs=self.runtime.ds_models)
 
-        model_type.change(self.runtime.search_model, inputs=[search_text, model_type], outputs=self.runtime.ds_models)
+        model_type.change(self.runtime.search_model, inputs=[search_text, nsfw_checker, model_type], outputs=self.runtime.ds_models)
 
         #btn_fetch.click(self.runtime.refresh_all_models, inputs=[], outputs=self.runtime.ds_models)
 
-        btn_search.click(self.runtime.search_model, inputs=[search_text, model_type], outputs=self.runtime.ds_models)
+        btn_search.click(self.runtime.search_model, inputs=[search_text, nsfw_checker, model_type], outputs=self.runtime.ds_models)
 
         self.runtime.ds_models.click(self.runtime.get_model_info,
                                      inputs=[self.runtime.ds_models],
