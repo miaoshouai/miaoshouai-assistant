@@ -18,10 +18,14 @@ import modules
 import random
 from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
 import openai
+import gc
 import json
 #import tkinter as tk
 #from tkinter import filedialog, ttk
-from modules import shared, sd_hijack
+import modules.devices as devices
+import torch
+from numba import cuda
+from modules import shared, sd_hijack, sd_samplers, processing
 from modules.sd_models import CheckpointInfo
 from scripts.download.msai_downloader_manager import MiaoshouDownloaderManager
 from scripts.msai_logging.msai_logger import Logger
@@ -212,7 +216,7 @@ class MiaoshouRuntime(object):
         return model_cover_thumbnails
 
     # TODO: add typing hint
-    def update_boot_settings(self, version, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
+    def update_boot_settings(self, version, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args, auto_vram):
         boot_settings = self.prelude.boot_settings
         boot_settings['drp_args_vram'] = drp_gpu
         boot_settings["drp_args_theme"] = drp_theme
@@ -222,6 +226,7 @@ class MiaoshouRuntime(object):
             boot_settings[chk] = self.prelude.checkboxes[chk]
         boot_settings['txt_args_more'] = additional_args
         boot_settings['drp_choose_version'] = version
+        boot_settings['auto_vram'] = auto_vram
 
         all_settings = self.prelude.all_settings
         all_settings['boot_settings'] = boot_settings
@@ -236,6 +241,40 @@ class MiaoshouRuntime(object):
         all_settings['boot_settings'] = boot_settings
         toolkit.write_json(self.prelude.setting_file, all_settings)
 
+    def change_auto_vram(self, auto_vram):
+        self.update_boot_setting('auto_vram', auto_vram)
+
+    def mem_release(self):
+        try:
+            gc.collect()
+            devices.torch_gc()
+            torch.cuda.empty_cache()
+            gc.collect()
+
+            print('Miaoshouai boot assistant: Memory Released!')
+        except:
+            print('Miaoshouai boot assistant: Memory Release Failed...!')
+
+    def force_mem_release(self):
+        try:
+            if hasattr(sd_samplers, "create_sampler_original_md"):
+                sd_samplers.create_sampler = sd_samplers.create_sampler_original_md
+                del sd_samplers.create_sampler_original_md
+            if hasattr(processing, "create_random_tensors_original_md"):
+                processing.create_random_tensors = processing.create_random_tensors_original_md
+                del processing.create_random_tensors_original_md
+
+            cuda.select_device(0)
+            cuda.close()
+            cuda.select_device(0)
+            self.mem_release()
+            msg = 'Memory Released! (May not work if you already got CUDA out of memory error)'
+        except Exception as e:
+            msg = f'Memory Release Failed! ({str(e)})'
+
+        return gr.Markdown.update(visible=True, value=msg)
+
+        return gr.Markdown.update(visible=True, value=msg)
     def get_all_models(self, site: str) -> t.Any:
         return toolkit.read_json(self.prelude.model_json[site])
 
@@ -1033,7 +1072,6 @@ class MiaoshouRuntime(object):
         return gr.TextArea.update(value=res_prompt)
 
     def update_gptapi(self, apikey):
-
         if apikey == '':
             res = 'Please enter a valid API Key'
             gpt_hint_text = 'Set your OpenAI api key in Setting & Update first: https://platform.openai.com/account/api-keys'

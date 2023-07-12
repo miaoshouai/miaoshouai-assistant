@@ -124,11 +124,17 @@ class MiaoShouAssistant(object):
                     with gr.Row():
                         sys_info_refbtn = gr.Button(value="Refresh")
 
+                    with gr.Row():
+                        md_vram_release = gr.Markdown(visible=False, interactive=False, value='Memory Released', show_label=False)
+                    with gr.Row():
+                        chk_auto_release = gr.Checkbox(value=self.prelude.boot_settings['auto_vram'], label='Enable Auto Memory Release')
+                        reload_button = gr.Button('Forc VRAM Release')
 
 
         self.drp_gpu.change(self.runtime.update_xformers, inputs=[self.drp_gpu, self.chk_group_args], outputs=[self.chk_group_args])
         sys_info_refbtn.click(self.prelude.get_sys_info, None, txt_sys_info)
-
+        chk_auto_release.change(self.runtime.change_auto_vram, inputs=[chk_auto_release])
+        reload_button.click(self.runtime.force_mem_release, outputs=[md_vram_release])
 
     def create_subtab_model_management(self) -> None:
         with gr.TabItem('Model Management', elem_id="model_management_tab") as tab_model_manager:
@@ -211,9 +217,12 @@ class MiaoShouAssistant(object):
                     with gr.Row(variant='panel'):
                         display_text = 'Select a model and type some text here, ChatGPT will generate prompt for you. Supports different text in different languages.'
                         display_value = ''
+
                         if self.prelude.boot_settings['openai_api'] == '':
+                            print('a')
                             display_text = 'Set your OpenAI api key in Setting & Update first: https://platform.openai.com/account/api-keys'
                             display_value = display_text
+
                         self.txt_main_prompt = gr.Textbox(label='Let ChatGPT write your prompt', placeholder=display_text, value=display_value, interactive=True, visible=True, elem_id="txt_main_prompt")
                     with gr.Row(variant='panel'):
                         with gr.Row():

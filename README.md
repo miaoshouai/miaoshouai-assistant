@@ -4,6 +4,8 @@
 
 MiaoshouAI Assistant for [Automatic1111 WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
+1.6 Add VRAM garbage collection for image generation so that VRAM is freed up after every run; if your run into out of memory, just go to Boot Assistant and click "VRAM Release" to free up the memory.
+1.5 Rewrote how assets are loaded to largely reduce the size and installation time for the extension. (extension reinstall is needed for this version and up). Added download covers for all models.
 1.4 Add new feature for using GPT to generate prompts. Fixed sub folder support for model management</br>
 1.3 Add support for LyCoris(just put them in the lora folder, <a herf="">LyCoris extension</a> is needed.); Cleanup work for git to reduce project size</br>
 1.2 Add support for model search. Allow model to load directly from model management. Now you can update model source directly under update tab.</br>
