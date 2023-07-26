@@ -322,7 +322,7 @@
     },
     {
         "id": 4,
-        "name": "stable-diffusion-XL 0.9",
+        "name": "stable-diffusion-XL 1.0",
         "description": "SDXL consists of a two-step pipeline for latent diffusion: First, we use a base model to generate latents of the desired output size. In the second step, we use a specialized high-resolution model and apply a technique called SDEdit (https://arxiv.org/abs/2108.01073, also known as \"img2img\") to the latents generated in the first step, using the same prompt.",
         "type": "Checkpoint",
         "poi": false,
@@ -347,7 +347,7 @@
             {
                 "id": 2,
                 "modelId": 2,
-                "name": "sd_xl_base_0.9",
+                "name": "sd_xl_base_1.0",
                 "createdAt": "2023-02-06T13:52:34.605Z",
                 "updatedAt": "2023-02-06T13:52:34.605Z",
                 "trainedWords": [],
@@ -356,9 +356,9 @@
                 "description": "<p></p>",
                 "files": [
                     {
-                        "name": "sd_xl_base_0.9.safetensors",
+                        "name": "sd_xl_base_1.0.safetensors",
                         "id": 6,
-                        "sizeKB": 13842126.130859375,
+                        "sizeKB": 7242126.130859375,
                         "type": "Model",
                         "format": "CKPT",
                         "pickleScanResult": "Success",
@@ -366,18 +366,18 @@
                         "virusScanResult": "Success",
                         "scannedAt": "2023-02-06T13:55:58.281Z",
                         "hashes": {
-                            "AutoV2": "1F69731261",
-                            "SHA256": "1F697312617DB511045698DBF419AE1E2999427D4E4423A321B461CC180D1A97",
-                            "CRC32": "1F69731261",
-                            "BLAKE3": "1F697312617DB511045698DBF419AE1E2999427D4E4423A321B461CC180D1A97"
+                            "AutoV2": "31E35C80FC",
+                            "SHA256": "31E35C80FC4829D14F90153F4C74CD59C90B779F6AFE05A74CD6120B893F7E5B",
+                            "CRC32": "31E35C80FC",
+                            "BLAKE3": "31E35C80FC4829D14F90153F4C74CD59C90B779F6AFE05A74CD6120B893F7E5B"
                         },
-                        "downloadUrl": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-0.9/resolve/main/sd_xl_base_0.9.safetensors",
+                        "downloadUrl": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors",
                         "primary": true
                     },
                     {
-                        "name": "sd_xl_refiner_0.9.safetensors",
+                        "name": "sd_xl_refiner_1.0.safetensors",
                         "id": 7,
-                        "sizeKB": 6421261.130859375,
+                        "sizeKB": 6221261.130859375,
                         "type": "Model",
                         "format": "Safetensors",
                         "pickleScanResult": "Success",
@@ -385,12 +385,31 @@
                         "virusScanResult": "Success",
                         "scannedAt": "2023-02-06T13:55:58.281Z",
                         "hashes": {
-                            "AutoV2": "13406F993C",
-                            "SHA256": "13406F993CA1F118E1FABF14F7E189B5271A4383512CB046887A5DE27375D227",
-                            "CRC32": "13406F993C",
-                            "BLAKE3": "13406F993CA1F118E1FABF14F7E189B5271A4383512CB046887A5DE27375D227"
+                            "AutoV2": "7440042BBD",
+                            "SHA256": "7440042BBDC8A24813002C09B6B69B64DC90FDED4472613437B7F55F9B7D9C5F",
+                            "CRC32": "7440042BBD",
+                            "BLAKE3": "7440042BBDC8A24813002C09B6B69B64DC90FDED4472613437B7F55F9B7D9C5F"
                         },
-                        "downloadUrl": "https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-0.9/resolve/main/sd_xl_refiner_0.9.safetensors",
+                        "downloadUrl": "https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors",
+                        "primary": true
+                    },
+                    {
+                        "name": "sdxl_vae.safetensors",
+                        "id": 7,
+                        "sizeKB": 360126.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "551EAC7037",
+                            "SHA256": "551EAC7037CE58DE1EF4447F16D48664C1E67F0E27AF50A06B1A6D458B571E0C",
+                            "CRC32": "551EAC7037",
+                            "BLAKE3": "551EAC7037CE58DE1EF4447F16D48664C1E67F0E27AF50A06B1A6D458B571E0C"
+                        },
+                        "downloadUrl": "https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors",
                         "primary": true
                     }
                 ],
@@ -543,6 +562,25 @@
                         },
                         "downloadUrl": "https://huggingface.co/hakurei/waifu-diffusion-v1-4/resolve/main/vae/kl-f8-anime2.ckpt",
                         "primary": false
+                    },
+                    {
+                        "name": "sdxl_vae.safetensors",
+                        "id": 7,
+                        "sizeKB": 360126.130859375,
+                        "type": "Model",
+                        "format": "Safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "551EAC7037",
+                            "SHA256": "551EAC7037CE58DE1EF4447F16D48664C1E67F0E27AF50A06B1A6D458B571E0C",
+                            "CRC32": "551EAC7037",
+                            "BLAKE3": "551EAC7037CE58DE1EF4447F16D48664C1E67F0E27AF50A06B1A6D458B571E0C"
+                        },
+                        "downloadUrl": "https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors",
+                        "primary": true
                     }
                 ],
                 "images": [
