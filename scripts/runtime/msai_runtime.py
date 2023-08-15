@@ -216,7 +216,7 @@ class MiaoshouRuntime(object):
         return model_cover_thumbnails
 
     # TODO: add typing hint
-    def update_boot_settings(self, version, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args, auto_vram):
+    def update_boot_settings(self, version, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
         boot_settings = self.prelude.boot_settings
         boot_settings['drp_args_vram'] = drp_gpu
         boot_settings["drp_args_theme"] = drp_theme
@@ -226,7 +226,6 @@ class MiaoshouRuntime(object):
             boot_settings[chk] = self.prelude.checkboxes[chk]
         boot_settings['txt_args_more'] = additional_args
         boot_settings['drp_choose_version'] = version
-        boot_settings['auto_vram'] = auto_vram
 
         all_settings = self.prelude.all_settings
         all_settings['boot_settings'] = boot_settings
