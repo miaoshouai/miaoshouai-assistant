@@ -197,7 +197,6 @@ class MiaoshouRuntime(object):
                         or in_filename:
 
                     self._allow_nsfw = chk_nsfw
-                    print(model.get('name'), model['modelVersions'][0]['baseModel'])
                     if (model_type == 'All' or model_type in model.get('type')) \
                             and (self.allow_nsfw or (not self.allow_nsfw and not model.get('nsfw'))) \
                             and ('baseModel' not in model['modelVersions'][0].keys() or (base_model is not None and model['modelVersions'][0]['baseModel'] in base_model)) \
