@@ -84,6 +84,8 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         }
 
         self._gpt_type = ['gpt-3.5-turbo', 'text-davinci-003']
+        self._model_tags = ['Character', 'Style', 'Anime', 'Photorealistic', 'Concept', 'Clothing', 'Base Model', 'Poses', 'Background', 'Tool', 'Buildings']
+        self._base_model_group = ['SD 1.4', 'SD 1.5', 'SD 2.0', 'SD 2.0 768', 'SD 2.1', 'SD 2.1 768', 'SD 2.1 Unclip', 'SDXL 0.9', 'SDXL 1.0', 'Other']
 
     @property
     def ext_folder(self) -> str:
@@ -157,8 +159,16 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         return self._model_type
 
     @property
-    def gpt_type(self) -> t.Dict[str, str]:
+    def gpt_type(self) -> t.List[str]:
         return self._gpt_type
+
+    @property
+    def model_tags(self) -> t.List[str]:
+        return self._model_tags
+
+    @property
+    def base_model_group(self) -> t.List[str]:
+        return self._base_model_group
 
     @property
     def model_json(self) -> t.Dict[str, t.Any]:

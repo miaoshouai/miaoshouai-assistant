@@ -170,7 +170,7 @@ class MiaoshouRuntime(object):
         else:
             self.logger.error(f"ds models is null")
 
-    def get_images_html(self, search: str = '', chk_nsfw: bool = False, model_type: str = 'All') -> t.List[str]:
+    def get_images_html(self, search: str = '', chk_nsfw: bool = False, base_model=None, model_type: str = 'All', model_tag: str ='All') -> t.List[str]:
         self.logger.info(f"get_image_html: model_type = {model_type}, and search pattern = '{search}'")
 
         model_cover_thumbnails = []
@@ -189,13 +189,20 @@ class MiaoshouRuntime(object):
                         and model.get('type') not in model_format:
                     model_format.append(model['type'])
 
+                in_filename = search in model['modelVersions'][0]['files'][0]['name'].lower()
+
                 if search == '' or \
                         (model.get('name') is not None and search.lower() in model.get('name').lower()) \
-                        or (model.get('description') is not None and search.lower() in model.get('description').lower()):
+                        or (model.get('description') is not None and search.lower() in model.get('description').lower()) \
+                        or in_filename:
 
                     self._allow_nsfw = chk_nsfw
+                    print(model.get('name'), model['modelVersions'][0]['baseModel'])
                     if (model_type == 'All' or model_type in model.get('type')) \
-                            and (self.allow_nsfw or (not self.allow_nsfw and not model.get('nsfw'))):
+                            and (self.allow_nsfw or (not self.allow_nsfw and not model.get('nsfw'))) \
+                            and ('baseModel' not in model['modelVersions'][0].keys() or (base_model is not None and model['modelVersions'][0]['baseModel'] in base_model)) \
+                            and (model_tag == 'All' or model_tag.lower() in model.get('tags')):
+
                         model_cover_thumbnails.append([
                             [f"""
                                 <div style="display: flex; align-items: center;">
@@ -476,9 +483,11 @@ class MiaoshouRuntime(object):
 
         return checkgroup
 
-    def set_nsfw(self, search='', nsfw_checker=False, model_type='All') -> t.Dict:
+    def set_nsfw(self, search='', nsfw_checker=False, base_model=None, model_type='All', model_tag='All') -> t.Dict:
+        if base_model is None:
+            base_model = ['SD 1.5']
         self._allow_nsfw = nsfw_checker
-        new_list = self.get_images_html(search, model_type)
+        new_list = self.get_images_html(search, base_model, model_type, model_tag)
         if self._ds_models is None:
             self.logger.error(f"_ds_models is not initialized")
             return {}
@@ -486,12 +495,12 @@ class MiaoshouRuntime(object):
         self._ds_models.samples = new_list
         return self._ds_models.update(samples=new_list)
 
-    def search_model(self, search='', chk_nsfw=False, model_type='All') -> t.Dict:
+    def search_model(self, search='', chk_nsfw=False, base_model=None, model_type='All', model_tag='All') -> t.Dict:
         if self._ds_models is None:
             self.logger.error(f"_ds_models is not initialized")
             return {}
 
-        new_list = self.get_images_html(search, chk_nsfw, model_type)
+        new_list = self.get_images_html(search, chk_nsfw, base_model, model_type, model_tag)
 
         self._ds_models.samples = new_list
         return self._ds_models.update(samples=new_list)

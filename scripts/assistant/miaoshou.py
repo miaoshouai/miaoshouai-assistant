@@ -286,6 +286,7 @@ class MiaoShouAssistant(object):
                     with gr.Row().style(equal_height=True):
                         search_text = gr.Textbox(
                             label="Model name",
+                            info="Search keywords in model name, description or file name",
                             show_label=False,
                             max_lines=1,
                             placeholder="Enter model name",
@@ -293,19 +294,31 @@ class MiaoShouAssistant(object):
                         btn_search = gr.Button("Search")
 
                     with gr.Row().style(equal_height=True):
+                        rad_model_tags = gr.Radio(['All'] + self.prelude.model_tags,
+                                                show_label=False, value='All', elem_id="rad_model_tags",
+                                                interactive=True).style(full_width=True)
+
+                    with gr.Row().style(equal_height=True):
                         nsfw_checker = gr.Checkbox(label='NSFW', value=False, elem_id="chk_nsfw", interactive=True)
-                        model_type = gr.Radio(["All"] + list(self.prelude.model_type.keys()),
+                        with gr.Accordion(label="Base Model", open=False):
+                            ckg_base_model = gr.CheckboxGroup(label='', choices=self.prelude.base_model_group,
+                                                              default=self.prelude.base_model_group,
+                                                              value=self.prelude.base_model_group,
+                                                              elem_id="ckg_base_model", interactive=True)
+                            btn_bm_apply = gr.Button(value="Apply fiter")
+                        with gr.Accordion(label="Model Type", open=False):
+                            model_type = gr.Radio(["All"] + list(self.prelude.model_type.keys()),
                                               show_label=False, value='All', elem_id="rad_model_type",
                                               interactive=True).style(full_width=True)
 
-                    images = self.runtime.get_images_html()
+                    images = self.runtime.get_images_html(base_model=self.prelude.base_model_group)
                     self.runtime.ds_models = gr.Dataset(
                         components=[gr.HTML(visible=False)],
                         headers=None,
                         type="values",
                         label="Models",
                         samples=images,
-                        samples_per_page=60,
+                        samples_per_page=45,
                         elem_id="model_dataset").style(type="gallery", container=True)
 
                 with gr.Column(elem_id="col_model_info"):
@@ -341,14 +354,15 @@ class MiaoShouAssistant(object):
                     with gr.Row():
                         model_info = gr.HTML(visible=True)
 
-        nsfw_checker.change(self.runtime.set_nsfw, inputs=[search_text, nsfw_checker, model_type],
+        rad_model_tags.change(self.runtime.search_model, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags], outputs=self.runtime.ds_models)
+        nsfw_checker.change(self.runtime.set_nsfw, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags],
                             outputs=self.runtime.ds_models)
-
-        model_type.change(self.runtime.search_model, inputs=[search_text, nsfw_checker, model_type], outputs=self.runtime.ds_models)
+        btn_bm_apply.click(self.runtime.search_model, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags], outputs=self.runtime.ds_models)
+        model_type.change(self.runtime.search_model, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags], outputs=self.runtime.ds_models)
 
         #btn_fetch.click(self.runtime.refresh_all_models, inputs=[], outputs=self.runtime.ds_models)
 
-        btn_search.click(self.runtime.search_model, inputs=[search_text, nsfw_checker, model_type], outputs=self.runtime.ds_models)
+        btn_search.click(self.runtime.search_model, inputs=[search_text, nsfw_checker, ckg_base_model, model_type], outputs=self.runtime.ds_models)
 
         self.runtime.ds_models.click(self.runtime.get_model_info,
                                      inputs=[self.runtime.ds_models],

@@ -4,6 +4,7 @@
 
 MiaoshouAI Assistant for [Automatic1111 WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
+1.7 Improved search capability for Civitai to include keyword search in model names; Now supports SDXL model search (Data source update and full of restart webui update required) and filter model by tags. Fixed model loading error.
 1.6 Add VRAM garbage collection for image generation so that VRAM is freed up after every run; if your run into out of memory, just go to Boot Assistant and click "VRAM Release" to free up the memory.
 1.5 Rewrote how assets are loaded to largely reduce the size and installation time for the extension. (extension reinstall is needed for this version and up). Added download covers for all models.
 1.4 Add new feature for using GPT to generate prompts. Fixed sub folder support for model management</br>
