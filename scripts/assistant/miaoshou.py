@@ -286,10 +286,9 @@ class MiaoShouAssistant(object):
                     with gr.Row().style(equal_height=True):
                         search_text = gr.Textbox(
                             label="Model name",
-                            info="Search keywords in model name, description or file name",
                             show_label=False,
                             max_lines=1,
-                            placeholder="Enter model name",
+                            placeholder="Search keywords in model name, description or file name",
                         )
                         btn_search = gr.Button("Search")
 
