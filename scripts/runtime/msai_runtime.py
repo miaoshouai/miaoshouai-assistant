@@ -842,7 +842,8 @@ class MiaoshouRuntime(object):
 
     def relocate_assets_if_needed(self):
         repo = git.Repo(self.prelude.ext_folder)
-        print('Updating asset repo...')
+        print('☕ Updating asset repo, it will take a while, please take a coffee break.')
+
         try:
             old_repo = True
             if os.path.exists(self.prelude.assets_folder):
