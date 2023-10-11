@@ -221,7 +221,6 @@ class MiaoShouAssistant(object):
                         display_value = ''
 
                         if self.prelude.boot_settings['openai_api'] == '':
-                            print('a')
                             display_text = 'Set your OpenAI api key in Setting & Update first: https://platform.openai.com/account/api-keys'
                             display_value = display_text
 
@@ -477,6 +476,9 @@ class MiaoShouAssistant(object):
             self.runtime.update_boot_setting('my_model_source', self.runtime.my_model_source)
 
         return gr.Dataset.update(samples=my_models)
+
+    def release_mem(self) -> None:
+        self.runtime.mem_release()
 
     def introception(self) -> None:
         self.runtime.introception()

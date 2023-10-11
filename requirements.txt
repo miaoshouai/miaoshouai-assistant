@@ -1,8 +1,10 @@
 psutil
-rehash
-tqdm
 openai
 numba
+sha256bit
 gpt_index==0.4.24
 langchain==0.0.132
 gradio_client==0.5.0
+requests==2.28.1
+urllib3==1.26.15
+tqdm==4.64.0

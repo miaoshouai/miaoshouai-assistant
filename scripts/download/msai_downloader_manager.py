@@ -11,6 +11,7 @@ from scripts.msai_logging.msai_logger import Logger
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
 import scripts.msai_utils.msai_toolkit as toolkit
 from urllib.request import Request, urlopen
+from scripts.download.resume_checkpoint import ResumeCheckpoint
 
 
 class DownloadingEntry(object):
@@ -197,6 +198,8 @@ class MiaoshouDownloaderManager(metaclass=MiaoshouSingleton):
             estimated_total_size=estimated_total_size,
             expected_checksum=expected_checksum
         )
+
+        ResumeCheckpoint.cleanup_checkpoints_if_needed(target_dir)
 
         asyncio.run_coroutine_threadsafe(self._submit_task(download_entry), self.looper.loop)
 

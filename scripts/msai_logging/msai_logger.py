@@ -57,10 +57,9 @@ class Logger(metaclass=MiaoshouSingleton):
                                           encoding="UTF-8")
         self._dataset[Logger.KEY_JOB].addHandler(job_handler)
 
-        if disable_console_output:
-            for k in [Logger.KEY_INFO, Logger.KEY_JOB, Logger.KEY_ERROR]:
-                l: logging.Logger = self._dataset[k]
-                l.propagate = not disable_console_output
+        for k in [Logger.KEY_INFO, Logger.KEY_JOB, Logger.KEY_ERROR]:
+            l: logging.Logger = self._dataset[k]
+            l.propagate = not disable_console_output
 
     def __init__(self, log_folder: str = None, disable_console_output: bool = False) -> None:
         if self._dataset is None:

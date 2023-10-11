@@ -2,8 +2,8 @@ import modules
 import modules.scripts as scripts
 
 from scripts.assistant.miaoshou import MiaoShouAssistant
-from scripts.runtime.msai_runtime import MiaoshouRuntime
 
+assistant = MiaoShouAssistant()
 
 class MiaoshouScript(scripts.Script):
     def __init__(self) -> None:
@@ -19,9 +19,8 @@ class MiaoshouScript(scripts.Script):
         return ()
 
     def postprocess(self, p, processed):
-        self.runtime = MiaoshouRuntime()
-        self.runtime.mem_release()
+        assistant.release_mem()
         return None
 
-assistant = MiaoShouAssistant()
+
 modules.script_callbacks.on_ui_tabs(assistant.on_event_ui_tabs_opened)

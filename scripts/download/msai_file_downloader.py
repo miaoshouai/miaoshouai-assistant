@@ -6,7 +6,7 @@ import typing as t
 from pathlib import Path
 from urllib.parse import urlparse
 
-import rehash
+from sha256bit import Sha256bit
 import requests
 from requests.adapters import HTTPAdapter
 from tqdm import tqdm
@@ -14,6 +14,7 @@ from urllib3.util import Retry
 
 import scripts.msai_utils.msai_toolkit as toolkit
 from scripts.msai_logging.msai_logger import Logger
+from scripts.download.resume_checkpoint import ResumeCheckpoint
 
 
 class MiaoshouFileDownloader(object):
@@ -44,7 +45,7 @@ class MiaoshouFileDownloader(object):
             total=3,
             backoff_factor=1,
             status_forcelist=[429, 500, 502, 503, 504],
-            method_whitelist=["HEAD", "GET", "OPTIONS"]
+            allowed_methods=["HEAD", "GET", "OPTIONS"]
         )
         adapter = HTTPAdapter(max_retries=retry_strategy)
         self.session = requests.Session()
@@ -63,7 +64,7 @@ class MiaoshouFileDownloader(object):
     def get_file_info_from_server(self, target_url: str) -> t.Tuple[bool, float]:
         try:
             headers = {"Accept-Encoding": "identity"}  # Avoid dealing with gzip
-            response = requests.head(target_url, headers=headers, allow_redirects=True)
+            response = requests.head(target_url, headers=headers, allow_redirects=True, timeout=10)
             response.raise_for_status()
             content_length = None
             if "Content-Length" in response.headers:
@@ -71,12 +72,14 @@ class MiaoshouFileDownloader(object):
             accept_ranges = (response.headers.get("Accept-Ranges") == "bytes")
             return accept_ranges, float(content_length)
         except Exception as ex:
-            self.logger.info(f"HEAD Request Error: {ex}")
+            self.logger.error(f"HEAD Request Error: {ex}")
             return False, self.estimated_content_length
 
     def download_file_full(self, target_url: str, local_filepath: str) -> t.Optional[str]:
         try:
-            checksum = rehash.sha256()
+            checksum = Sha256bit()
+            checksum._verbose = False
+
             headers = {"Accept-Encoding": "identity"}  # Avoid dealing with gzip
 
             with tqdm(total=self.content_length, unit="byte", unit_scale=1, colour="GREEN",
@@ -90,9 +93,12 @@ class MiaoshouFileDownloader(object):
                     checksum.update(chunk)
                     progressbar.update(len(chunk))
                     self.update_progress(len(chunk))
-
+                    try:
+                        checksum.update(chunk)
+                    except Exception as err:
+                        self.logger.error(f"checksum error {err}")
         except Exception as ex:
-            self.logger.info(f"Download error: {ex}")
+            self.logger.error(f"Download error: {ex}")
             return None
 
         return checksum.hexdigest()
@@ -105,9 +111,10 @@ class MiaoshouFileDownloader(object):
             assert os.path.exists(local_filepath)  # catch checkpoint without file
             self.logger.info("File already exists, resuming download.")
         except Exception as e:
-            self.logger.error(f"failed to load downloading checkpoint - {download_checkpoint} due to {e}")
+            self.logger.warn(f"failed to load downloading checkpoint - {download_checkpoint} due to {e}")
             resume_point = 0
-            checksum = rehash.sha256()
+            checksum = Sha256bit()
+            checksum._verbose = False
             if os.path.exists(local_filepath):
                 os.remove(local_filepath)
             Path(local_filepath).touch()
@@ -135,6 +142,11 @@ class MiaoshouFileDownloader(object):
                     pickle.dump((resume_point, checksum), open(download_checkpoint, "wb"))
                     progressbar.update(len(chunk))
                     self.update_progress(len(chunk))
+                    try:
+                        checksum.update(chunk)
+                        ResumeCheckpoint.store_resume_checkpoint(resume_point, checksum, download_checkpoint)
+                    except Exception as err:
+                        self.logger.error(f"failed to save checkpoint {err}")
 
                 # Only remove checkpoint at full size in case connection cut
                 if os.path.getsize(local_filepath) == self.content_length:
@@ -217,6 +229,9 @@ class MiaoshouFileDownloader(object):
                 self.logger.info(f"{self.target_url} [  FAILED  ]")
 
         except Exception as ex:
-            self.logger.info(f"Unexpected Error: {ex}")  # Only from block above
+            self.logger.error(f"Unexpected Error: {ex}")  # Only from block above
+        finally:
+            ResumeCheckpoint.store_version_info(local_filepath)
+
 
         return success
