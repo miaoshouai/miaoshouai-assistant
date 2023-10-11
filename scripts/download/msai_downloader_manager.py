@@ -13,7 +13,6 @@ import scripts.msai_utils.msai_toolkit as toolkit
 from urllib.request import Request, urlopen
 from scripts.download.resume_checkpoint import ResumeCheckpoint
 
-
 class DownloadingEntry(object):
     def __init__(self, target_url: str = None, local_file: str = None,
                  local_directory: str = None, estimated_total_size: float = 0., expected_checksum: str = None):
@@ -105,6 +104,9 @@ class MiaoshouDownloaderManager(metaclass=MiaoshouSingleton):
             self.looper.start()
             self.logger.info("download manager is ready")
             self._mutex = Lock()
+
+        ResumeCheckpoint.cleanup_checkpoints_if_needed(toolkit.get_user_temp_dir())
+        ResumeCheckpoint.store_version_info(toolkit.get_user_temp_dir())
 
     def consume_all_ready_messages(self) -> None:
         """
@@ -198,8 +200,6 @@ class MiaoshouDownloaderManager(metaclass=MiaoshouSingleton):
             estimated_total_size=estimated_total_size,
             expected_checksum=expected_checksum
         )
-
-        ResumeCheckpoint.cleanup_checkpoints_if_needed(target_dir)
 
         asyncio.run_coroutine_threadsafe(self._submit_task(download_entry), self.looper.loop)
 

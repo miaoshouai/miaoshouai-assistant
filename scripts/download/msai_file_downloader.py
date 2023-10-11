@@ -230,8 +230,6 @@ class MiaoshouFileDownloader(object):
 
         except Exception as ex:
             self.logger.error(f"Unexpected Error: {ex}")  # Only from block above
-        finally:
-            ResumeCheckpoint.store_version_info(local_filepath)
 
 
         return success
