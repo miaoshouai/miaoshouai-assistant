@@ -448,6 +448,9 @@ class MiaoshouRuntime(object):
         except Exception as e:
             dst = self.prelude.no_preview_img
 
+        if self.my_model_set is None:
+            return None
+
         for model in self.my_model_set:
             match = False
 
