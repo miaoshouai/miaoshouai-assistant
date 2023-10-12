@@ -75,18 +75,3 @@ class ResumeCheckpoint(object):
         except Exception:
             return None
 
-
-if __name__ == "__main__":
-    checkpoint_dir = "/tmp/miaomiao_download"
-    os.makedirs(checkpoint_dir, exist_ok=True)
-
-    ResumeCheckpoint.cleanup_checkpoints_if_needed(checkpoint_dir)
-    ResumeCheckpoint.store_version_info(checkpoint_dir)
-
-    pathlib.Path(checkpoint_dir, "one.downloading").touch(exist_ok=True)
-    pathlib.Path(checkpoint_dir, "two.downloading").touch(exist_ok=True)
-    pathlib.Path(checkpoint_dir, "three.downloading").touch(exist_ok=True)
-
-    print("two.downloading: {}".format(
-        ResumeCheckpoint.calculate_hash_of_file("/tmp/miaomiao_download/three.downloading")))
-
