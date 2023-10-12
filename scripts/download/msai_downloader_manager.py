@@ -1,17 +1,18 @@
 import asyncio
 import os.path
 import queue
-import time
 import requests
+import time
 import typing as t
 from threading import Thread, Lock
+from urllib.request import Request, urlopen
 
+import scripts.msai_utils.msai_toolkit as toolkit
 from scripts.download.msai_file_downloader import MiaoshouFileDownloader
+from scripts.download.resume_checkpoint import ResumeCheckpoint
 from scripts.msai_logging.msai_logger import Logger
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
-import scripts.msai_utils.msai_toolkit as toolkit
-from urllib.request import Request, urlopen
-from scripts.download.resume_checkpoint import ResumeCheckpoint
+
 
 class DownloadingEntry(object):
     def __init__(self, target_url: str = None, local_file: str = None,

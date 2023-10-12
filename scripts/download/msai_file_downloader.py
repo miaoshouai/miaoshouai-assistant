@@ -1,20 +1,18 @@
 import os
 import pickle
 import queue
+import requests
 import time
 import typing as t
 from pathlib import Path
-from urllib.parse import urlparse
-
-from sha256bit import Sha256bit
-import requests
 from requests.adapters import HTTPAdapter
 from tqdm import tqdm
+from urllib.parse import urlparse
 from urllib3.util import Retry
 
 import scripts.msai_utils.msai_toolkit as toolkit
-from scripts.msai_logging.msai_logger import Logger
 from scripts.download.resume_checkpoint import ResumeCheckpoint
+from scripts.msai_logging.msai_logger import Logger
 
 
 class MiaoshouFileDownloader(object):
@@ -77,9 +75,6 @@ class MiaoshouFileDownloader(object):
 
     def download_file_full(self, target_url: str, local_filepath: str) -> t.Optional[str]:
         try:
-            checksum = Sha256bit()
-            checksum._verbose = False
-
             headers = {"Accept-Encoding": "identity"}  # Avoid dealing with gzip
 
             with tqdm(total=self.content_length, unit="byte", unit_scale=1, colour="GREEN",
@@ -90,31 +85,26 @@ class MiaoshouFileDownloader(object):
 
                 for chunk in response.iter_content(MiaoshouFileDownloader.CHUNK_SIZE):
                     file_out.write(chunk)
-                    checksum.update(chunk)
                     progressbar.update(len(chunk))
                     self.update_progress(len(chunk))
-                    try:
-                        checksum.update(chunk)
-                    except Exception as err:
-                        self.logger.error(f"checksum error {err}")
         except Exception as ex:
             self.logger.error(f"Download error: {ex}")
             return None
 
-        return checksum.hexdigest()
+        # it's time to start to calculate hash since the file is downloaded successfully
+        return ResumeCheckpoint.calculate_hash_of_file(local_filepath)
 
     def download_file_resumable(self, target_url: str, local_filepath: str) -> t.Optional[str]:
         # Always go off the checkpoint as the file was flushed before writing.
         download_checkpoint = local_filepath + ".downloading"
         try:
-            resume_point, checksum = pickle.load(open(download_checkpoint, "rb"))
             assert os.path.exists(local_filepath)  # catch checkpoint without file
+
+            resume_point = ResumeCheckpoint.load_resume_checkpoint(download_checkpoint)
             self.logger.info("File already exists, resuming download.")
         except Exception as e:
-            self.logger.warn(f"failed to load downloading checkpoint - {download_checkpoint} due to {e}")
+            self.logger.warn(f"failed to load downloading checkpoint - {download_checkpoint} {e}")
             resume_point = 0
-            checksum = Sha256bit()
-            checksum._verbose = False
             if os.path.exists(local_filepath):
                 os.remove(local_filepath)
             Path(local_filepath).touch()
@@ -138,15 +128,9 @@ class MiaoshouFileDownloader(object):
                     file_out.write(chunk)
                     file_out.flush()
                     resume_point += len(chunk)
-                    checksum.update(chunk)
-                    pickle.dump((resume_point, checksum), open(download_checkpoint, "wb"))
                     progressbar.update(len(chunk))
                     self.update_progress(len(chunk))
-                    try:
-                        checksum.update(chunk)
-                        ResumeCheckpoint.store_resume_checkpoint(resume_point, checksum, download_checkpoint)
-                    except Exception as err:
-                        self.logger.error(f"failed to save checkpoint {err}")
+                    ResumeCheckpoint.store_resume_checkpoint(resume_point, download_checkpoint)
 
                 # Only remove checkpoint at full size in case connection cut
                 if os.path.getsize(local_filepath) == self.content_length:
@@ -158,7 +142,7 @@ class MiaoshouFileDownloader(object):
             self.logger.error(f"Download error: {ex}")
             return None
 
-        return checksum.hexdigest()
+        return ResumeCheckpoint.calculate_hash_of_file(local_filepath)
 
     def update_progress(self, finished_chunk_size: int) -> None:
         self.finished_chunk_size += finished_chunk_size
@@ -178,6 +162,9 @@ class MiaoshouFileDownloader(object):
     def download_file(self) -> bool:
         success = False
         try:
+            print(f"\n\n🚀 miaoshou-assistant downloader: start to download {self.target_url}")
+            self.logger.info(f"miaoshou-assistant downloader: start to download {self.target_url}")
+
             # Need to rebuild local_file_final each time in case of different urls
             if not self.local_file:
                 specific_local_file = os.path.basename(urlparse(self.target_url).path)
@@ -205,20 +192,17 @@ class MiaoshouFileDownloader(object):
                 self.logger.info(f"Download Attempt {i + 1}")
                 checksum = download_method(self.target_url, specific_local_file)
                 if checksum:
-                    match = ""
-                    if self.expected_checksum:
-                        match = ", Checksum Match"
-
                     if self.expected_checksum and self.expected_checksum != checksum:
                         self.logger.info(f"Checksum doesn't match. Calculated {checksum} "
                                          f"Expecting: {self.expected_checksum}")
                     else:
-                        self.logger.info(f"Download successful{match}. Checksum {checksum}")
+                        self.logger.info(f"Download successful, Checksum Matched. Checksum {checksum}")
                         success = True
                         break
                 time.sleep(1)
 
             if success:
+                print(f"\n\n🎉 miaoshou-assistant downloader: {self.target_url} [download completed]")
                 self.logger.info(f"{self.target_url} [DOWNLOADED COMPLETELY]")
                 if self.local_directory:
                     target_local_file = os.path.join(self.local_directory, self.local_file)
@@ -226,9 +210,11 @@ class MiaoshouFileDownloader(object):
                     target_local_file = self.local_file
                 toolkit.move_file(specific_local_file, target_local_file)
             else:
+                print(f"\n\n😭 miaoshou-assistant downloader: {self.target_url} [download failed]")
                 self.logger.info(f"{self.target_url} [  FAILED  ]")
 
         except Exception as ex:
+            print(f"\n\n😭 miaoshou-assistant downloader: download failed with unexpected error: {ex}")
             self.logger.error(f"Unexpected Error: {ex}")  # Only from block above
 
 

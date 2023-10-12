@@ -1,32 +1,33 @@
 import datetime
 import fileinput
-import os
-import platform
-import re
-import shutil
-import sys
-import io
-import time
-import typing as t
-import gzip
+import gc
 import git
 import gradio as gr
-import requests
-from bs4 import BeautifulSoup
-import subprocess
-import modules
-import random
-from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
-import openai
-import gc
+import gzip
+import io
 import json
-#import tkinter as tk
-#from tkinter import filedialog, ttk
+import modules
+# import tkinter as tk
+# from tkinter import filedialog, ttk
 import modules.devices as devices
+import openai
+import os
+import platform
+import random
+import re
+import requests
+import shutil
+import subprocess
+import sys
+import time
 import torch
-from numba import cuda
+import typing as t
+from bs4 import BeautifulSoup
+from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
 from modules import shared, sd_hijack, sd_samplers, processing
 from modules.sd_models import CheckpointInfo
+from numba import cuda
+
 from scripts.download.msai_downloader_manager import MiaoshouDownloaderManager
 from scripts.msai_logging.msai_logger import Logger
 from scripts.msai_utils import msai_toolkit as toolkit
@@ -842,7 +843,7 @@ class MiaoshouRuntime(object):
 
     def relocate_assets_if_needed(self):
         repo = git.Repo(self.prelude.ext_folder)
-        print('☕ Updating asset repo, it will take a while, please take a coffee break.')
+        print('🕗 Updating asset repo, it will take a while, please take a coffee break...')
 
         try:
             old_repo = True
