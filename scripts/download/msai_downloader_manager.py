@@ -1,16 +1,17 @@
 import asyncio
 import os.path
 import queue
-import time
 import requests
+import time
 import typing as t
 from threading import Thread, Lock
+from urllib.request import Request, urlopen
 
+import scripts.msai_utils.msai_toolkit as toolkit
 from scripts.download.msai_file_downloader import MiaoshouFileDownloader
+from scripts.download.resume_checkpoint import ResumeCheckpoint
 from scripts.msai_logging.msai_logger import Logger
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
-import scripts.msai_utils.msai_toolkit as toolkit
-from urllib.request import Request, urlopen
 
 
 class DownloadingEntry(object):
@@ -104,6 +105,9 @@ class MiaoshouDownloaderManager(metaclass=MiaoshouSingleton):
             self.looper.start()
             self.logger.info("download manager is ready")
             self._mutex = Lock()
+
+        ResumeCheckpoint.cleanup_checkpoints_if_needed(toolkit.get_user_temp_dir())
+        ResumeCheckpoint.store_version_info(toolkit.get_user_temp_dir())
 
     def consume_all_ready_messages(self) -> None:
         """

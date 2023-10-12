@@ -1,18 +1,19 @@
+import gradio as gr
+import launch
+import modules
+import modules.generation_parameters_copypaste as parameters_copypaste
 import os
 import sys
 import typing as t
-
-import gradio as gr
-from modules.sd_models import CheckpointInfo
-from modules.call_queue import wrap_queued_call
-import launch
-import modules
 from modules import shared
+from modules.call_queue import wrap_queued_call
+from modules.sd_models import CheckpointInfo
+from modules.ui_components import ToolButton
+
 from scripts.msai_logging.msai_logger import Logger
 from scripts.runtime.msai_prelude import MiaoshouPrelude
 from scripts.runtime.msai_runtime import MiaoshouRuntime
-import modules.generation_parameters_copypaste as parameters_copypaste
-from modules.ui_components import ToolButton
+from . import widget
 
 
 class MiaoShouAssistant(object):
@@ -82,14 +83,14 @@ class MiaoShouAssistant(object):
 
                         '''def mod_args(drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):
                           global commandline_args
-      
+
                           get_final_args(drp_gpu, drp_theme, txt_listen_port, hk_group_args, additional_args)
-      
+
                           print(commandline_args)
                           print(sys.argv)
                           #if '--xformers' not in sys.argv:
                             #sys.argv.append('--xformers')
-      
+
                         settings_submit.click(mod_args, inputs=[drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args], outputs=[])'''
 
                     save_settings.click(self.runtime.change_boot_setting,
@@ -151,7 +152,7 @@ class MiaoShouAssistant(object):
                     with gr.Row():
                         btn_connect_modeldir = gr.Button(value="Apply Virtual Model Folder")
 
-                    with gr.Row().style(equal_height=True):
+                    with widget.Row(equal_height=True):
                         my_search_text = gr.Textbox(
                             label="Model name",
                             show_label=False,
@@ -161,18 +162,19 @@ class MiaoShouAssistant(object):
                         btn_my_search = gr.Button("Search")
 
                     with gr.Row():
-                        my_model_source_dropdown = gr.Dropdown(
+                        my_model_source_dropdown = widget.Dropdown(
                             choices=["civitai.com", "liandange.com"],
                             value=self.runtime.my_model_source,
                             label="Select Model Source",
                             type="value",
                             show_label=True,
-                            elem_id="my_model_source").style(full_width=False)
+                            elem_id="my_model_source",
+                            show_progress="full")
 
                         mtypes = list(self.prelude.model_type.keys())
-                        my_model_type = gr.Radio(mtypes,
+                        my_model_type = widget.Radio(choices=mtypes,
                                               show_label=False, value='Checkpoint', elem_id="my_model_type",
-                                              interactive=True).style(full_width=True)
+                                              interactive=True, elem_classes="full")
 
                     with gr.Row():
                         my_models = self.runtime.get_local_models('', my_model_type.value)
@@ -219,7 +221,6 @@ class MiaoShouAssistant(object):
                         display_value = ''
 
                         if self.prelude.boot_settings['openai_api'] == '':
-                            print('a')
                             display_text = 'Set your OpenAI api key in Setting & Update first: https://platform.openai.com/account/api-keys'
                             display_value = display_text
 
@@ -273,17 +274,18 @@ class MiaoShouAssistant(object):
         with gr.TabItem('Model Download', elem_id="model_download_tab") as tab_downloads:
             with gr.Row():
                 with gr.Column(elem_id="col_model_list"):
-                    with gr.Row().style(equal_height=True):
-                        model_source_dropdown = gr.Dropdown(choices=["civitai.com", "liandange.com", "official_models", 'hugging_face', "controlnet"],
+                    with widget.Row(equal_height=True):
+                        model_source_dropdown = widget.Dropdown(choices=["civitai.com", "liandange.com", "official_models", 'hugging_face', "controlnet"],
                                                             value=self.runtime.model_source,
                                                             label="Select Model Source",
                                                             type="value",
                                                             show_label=True,
-                                                            elem_id="model_source").style(full_width=True)
+                                                            elem_id="model_source",
+                                                            show_progress="full")
 
                         #btn_fetch = gr.Button("Fetch")
 
-                    with gr.Row().style(equal_height=True):
+                    with widget.Row(equal_height=True):
                         search_text = gr.Textbox(
                             label="Model name",
                             show_label=False,
@@ -292,12 +294,12 @@ class MiaoShouAssistant(object):
                         )
                         btn_search = gr.Button("Search")
 
-                    with gr.Row().style(equal_height=True):
-                        rad_model_tags = gr.Radio(['All'] + self.prelude.model_tags,
+                    with widget.Row(equal_height=True):
+                        rad_model_tags = widget.Radio(choices=['All'] + self.prelude.model_tags,
                                                 show_label=False, value='All', elem_id="rad_model_tags",
-                                                interactive=True).style(full_width=True)
+                                                interactive=True, elem_classes="full")
 
-                    with gr.Row().style(equal_height=True):
+                    with widget.Row(equal_height=True):
                         nsfw_checker = gr.Checkbox(label='NSFW', value=False, elem_id="chk_nsfw", interactive=True)
                         with gr.Accordion(label="Base Model", open=False):
                             ckg_base_model = gr.CheckboxGroup(label='', choices=self.prelude.base_model_group,
@@ -306,30 +308,36 @@ class MiaoShouAssistant(object):
                                                               elem_id="ckg_base_model", interactive=True)
                             btn_bm_apply = gr.Button(value="Apply fiter")
                         with gr.Accordion(label="Model Type", open=False):
-                            model_type = gr.Radio(["All"] + list(self.prelude.model_type.keys()),
+                            model_type = gr.Radio(choices=["All"] + list(self.prelude.model_type.keys()),
                                               show_label=False, value='All', elem_id="rad_model_type",
-                                              interactive=True).style(full_width=True)
+                                              interactive=True, elem_classes="full")
 
                     images = self.runtime.get_images_html(base_model=self.prelude.base_model_group)
-                    self.runtime.ds_models = gr.Dataset(
+                    self.runtime.ds_models = widget.Dataset(
                         components=[gr.HTML(visible=False)],
                         headers=None,
                         type="values",
                         label="Models",
                         samples=images,
                         samples_per_page=45,
-                        elem_id="model_dataset").style(type="gallery", container=True)
+                        elem_id="model_dataset",
+                        elem_classes="gallery",
+                        container=True)
+
+
 
                 with gr.Column(elem_id="col_model_info"):
                     with gr.Row():
-                        self.runtime.ds_cover_gallery = gr.Dataset(
-                            components=[gr.HTML(visible=False)],
-                            headers=None,
-                            type="values",
-                            label="Cover",
-                            samples=[],
-                            samples_per_page=10,
-                            elem_id="ds_cover_gallery").style(type="gallery", container=True)
+                        self.runtime.ds_cover_gallery = widget.Dataset(
+                                components=[gr.HTML(visible=False)],
+                                headers=None,
+                                type="values",
+                                label="Cover",
+                                samples=[],
+                                samples_per_page=10,
+                                elem_id="ds_cover_gallery",
+                                elem_classes="gallery",
+                                container=True)
 
                     with gr.Row():
                         with gr.Column():
@@ -468,6 +476,9 @@ class MiaoShouAssistant(object):
             self.runtime.update_boot_setting('my_model_source', self.runtime.my_model_source)
 
         return gr.Dataset.update(samples=my_models)
+
+    def release_mem(self) -> None:
+        self.runtime.mem_release()
 
     def introception(self) -> None:
         self.runtime.introception()

@@ -1,17 +1,16 @@
+import launch
+import modules
 import os
 import platform
-import sys
-import typing as t
-
 import psutil
+import sys
 import torch
-
-import launch
+import typing as t
 from modules import shared
+
 from scripts.msai_logging.msai_logger import Logger
 from scripts.msai_utils import msai_toolkit as toolkit
 from scripts.msai_utils.msai_singleton import MiaoshouSingleton
-import modules
 
 
 class MiaoshouPrelude(metaclass=MiaoshouSingleton):
