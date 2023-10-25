@@ -471,7 +471,6 @@ class MiaoShouAssistant(object):
             if key in item['stats']:
                 return item['stats'][key]
 
-        print(sort_by)
         self.runtime.model_source = new_model_source
         show_download_button = self.runtime.model_source != "liandange.com"
 
@@ -480,6 +479,7 @@ class MiaoShouAssistant(object):
         else:
             self.runtime.sorted_model_set = self.runtime.model_set
 
+        print(len(self.runtime.sorted_model_set))
         if self.runtime.ds_models:
             self.runtime.ds_models.samples = self.runtime.sorted_model_set
             self.runtime.ds_models.update(samples=self.runtime.sorted_model_set)
@@ -488,7 +488,7 @@ class MiaoShouAssistant(object):
 
         images = self.runtime.get_images_html(search, chk_nsfw, base_model, model_type, model_tag)
         #images = self.runtime.sort_dataset(search, chk_nsfw, base_model, model_type, model_tag)
-        print(images[0])
+
         self.runtime.ds_models.samples = images
         self.runtime.ds_models.update(samples=self.runtime.sorted_model_set)
 

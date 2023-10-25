@@ -197,7 +197,7 @@ class MiaoshouRuntime(object):
 
     def get_images_html(self, search: str = '', chk_nsfw: bool = False, base_model=None, model_type: str = 'All', model_tag: str = 'All') -> t.List[str]:
         if base_model is None:
-            base_model = ['SD 1.5']
+            base_model = []
         self.logger.info(f"get_image_html: model_type = {model_type}, and search pattern = '{search}'")
 
         model_cover_thumbnails = []
@@ -230,7 +230,7 @@ class MiaoshouRuntime(object):
                     self._allow_nsfw = chk_nsfw
                     if (model_type == 'All' or model_type in model.get('type')) \
                             and (self.allow_nsfw or (not self.allow_nsfw and not model.get('nsfw'))) \
-                            and ('baseModel' not in model['modelVersions'][0].keys() or (base_model is not None and model['modelVersions'][0]['baseModel'] in base_model)) \
+                            and ('baseModel' not in model['modelVersions'][0].keys() or (len(base_model) > 0 and model['modelVersions'][0]['baseModel'] in base_model)) \
                             and (model_tag == 'All' or model_tag.lower() in model.get('tags')):
 
                         model_cover_thumbnails.append([
@@ -518,7 +518,7 @@ class MiaoshouRuntime(object):
 
     def set_nsfw(self, search='', nsfw_checker=False, base_model=None, model_type='All', model_tag='All') -> t.Dict:
         if base_model is None:
-            base_model = ['SD 1.5']
+            base_model = []
         self._allow_nsfw = nsfw_checker
         new_list = self.get_images_html(search, nsfw_checker, base_model, model_type, model_tag)
         if self._ds_models is None:
@@ -539,7 +539,6 @@ class MiaoshouRuntime(object):
             self.logger.error(f"_ds_models is not initialized")
             return {}
 
-        print(base_model)
         new_list = self.get_images_html(search, chk_nsfw, base_model, model_type, model_tag)
 
         self._ds_models.samples = new_list
@@ -652,6 +651,7 @@ class MiaoshouRuntime(object):
         htmlDetail = "<div><p>No info found</p></div>"
 
         mid = models[1]
+        print(mid)
 
         # TODO: use map to enhance the performances
         if self.active_model_set == 'model_set':
