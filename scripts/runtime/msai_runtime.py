@@ -651,7 +651,6 @@ class MiaoshouRuntime(object):
         htmlDetail = "<div><p>No info found</p></div>"
 
         mid = models[1]
-        print(mid)
 
         # TODO: use map to enhance the performances
         if self.active_model_set == 'model_set':
