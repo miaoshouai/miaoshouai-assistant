@@ -41,6 +41,7 @@ class MiaoshouRuntime(object):
         self.prelude = MiaoshouPrelude()
         self._old_additional: str = None
         self._model_set: t.List[t.Dict] = None
+        self._sorted_model_set: t.List[t.Dict] = None
         self._my_model_set: t.List[t.Dict] = None
         self._active_model_set: str = None
         self._model_set_last_access_time: datetime.datetime = None
@@ -171,20 +172,49 @@ class MiaoshouRuntime(object):
         else:
             self.logger.error(f"ds models is null")
 
-    def get_images_html(self, search: str = '', chk_nsfw: bool = False, base_model=None, model_type: str = 'All', model_tag: str ='All') -> t.List[str]:
+    def sort_dataset(self, search='', chk_nsfw=False, base_model=None, model_type='All', model_tag='All',
+                     sort_by='Default') -> t.Dict:
+
+        def sort_key(item, key):
+            if key in item['stats']:
+                return item['stats'][key]
+
+        if sort_by != 'Default':
+            self.sorted_model_set = sorted(self.model_set, key=lambda item: sort_key(item, sort_by), reverse=True)
+        else:
+            self.sorted_model_set = self.model_set
+
+        if self.ds_models:
+            self.ds_models.samples = self.sorted_model_set
+            self.ds_models.update(samples=self.sorted_model_set)
+        else:
+            self.logger.error(f"ds models is null")
+
+        new_list = self.get_images_html(search, chk_nsfw, base_model, model_type, model_tag)
+
+        self._ds_models.samples = new_list
+        return self._ds_models.update(samples=new_list)
+
+    def get_images_html(self, search: str = '', chk_nsfw: bool = False, base_model=None, model_type: str = 'All', model_tag: str = 'All') -> t.List[str]:
+        if base_model is None:
+            base_model = ['SD 1.5']
         self.logger.info(f"get_image_html: model_type = {model_type}, and search pattern = '{search}'")
 
         model_cover_thumbnails = []
         model_format = []
 
-        if self.model_set is None:
-            self.logger.error("model_set is null")
-            return []
+        if self.sorted_model_set is None:
+            if self.model_set is None:
+                self.logger.error("model_set is null")
+                return []
+            else:
+                self.sorted_model_set = self.model_set
+
 
         self.logger.info(f"{len(self.model_set)} items inside '{self.model_source}'")
 
         search = search.lower()
-        for model in self.model_set:
+        for model in self.sorted_model_set:
             try:
                 if model.get('type') is not None \
                         and model.get('type') not in model_format:
@@ -490,7 +520,7 @@ class MiaoshouRuntime(object):
         if base_model is None:
             base_model = ['SD 1.5']
         self._allow_nsfw = nsfw_checker
-        new_list = self.get_images_html(search, base_model, model_type, model_tag)
+        new_list = self.get_images_html(search, nsfw_checker, base_model, model_type, model_tag)
         if self._ds_models is None:
             self.logger.error(f"_ds_models is not initialized")
             return {}
@@ -498,11 +528,18 @@ class MiaoshouRuntime(object):
         self._ds_models.samples = new_list
         return self._ds_models.update(samples=new_list)
 
+    def set_basemodel(self, sel_base='All'):
+        if sel_base == 'All':
+            return gr.Radio.update(value=self.prelude.base_model_group)
+        else:
+            return gr.update(value=[False] * len(self.prelude.base_model_group))
+
     def search_model(self, search='', chk_nsfw=False, base_model=None, model_type='All', model_tag='All') -> t.Dict:
         if self._ds_models is None:
             self.logger.error(f"_ds_models is not initialized")
             return {}
 
+        print(base_model)
         new_list = self.get_images_html(search, chk_nsfw, base_model, model_type, model_tag)
 
         self._ds_models.samples = new_list
@@ -526,9 +563,92 @@ class MiaoshouRuntime(object):
 
         return [payload]
 
-    def get_model_info(self, models) -> t.Tuple[t.List[t.List[str]], t.Dict, str, t.Dict]:
+    def get_coverimg_by_mv(self, cur_version):
+        cover_imgs = []
+
+        if cur_version.get('images') and isinstance(cur_version.get('images'), list):
+            for img in cur_version['images']:
+                if self.allow_nsfw or (
+                    not self.allow_nsfw and (not img.get('nsfw') or img.get('nsfw') in ['None', 'Soft'])):
+                    if img.get('url'):
+                        cover_imgs.append([f'<img referrerpolicy="no-referrer" src="{img["url"].replace("width=450", "width=150").replace("/w/100", "/w/150")}" style="width:150px;">'])
+        return cover_imgs
+
+    def get_files_by_mv(self, cur_version, mtype, cover_imgs):
+        drop_list = []
+        download_url_by_default = None
+
+        self.model_files.clear()
+        if cur_version.get('files') and isinstance(cur_version.get('files'), list):
+            for file in cur_version['files']:
+                # error checking for mandatory fields
+                if file.get('id') is not None and file.get('downloadUrl') is not None:
+                    item_name = None
+                    if file.get('name'):
+                        item_name = file.get('name')
+                    if not item_name and cur_version.get('name'):
+                        item_name = cur_version['name']
+                    if not item_name:
+                        item_name = "unknown"
+
+                    self.model_files.append({
+                        "id:": file['id'],
+                        "url": file['downloadUrl'],
+                        "name": item_name,
+                        "type": mtype,
+                        "size": file['sizeKB'] * 1024 if file.get('sizeKB') else "unknown",
+                        "format": file['format'] if file.get('format') else "unknown",
+                        "cover": cover_imgs[0][0] if len(cover_imgs) > 0 else toolkit.get_not_found_image_url(),
+                    })
+                    file_size = toolkit.get_readable_size(file['sizeKB'] * 1024) if file.get('sizeKB') else ""
+                    if file_size:
+                        drop_list.append(f"{item_name} ({file_size})")
+                    else:
+                        drop_list.append(f"{item_name}")
+
+                    if not download_url_by_default:
+                        download_url_by_default = file.get('downloadUrl')
+
+        return drop_list, download_url_by_default
+
+    def select_version(self, models, version_name):
+        mid = models[1]
+        cover_imgs = []
+        drop_list = []
+        download_url_by_default = None
+
+        if self.model_source == "civitai.com" or self.model_source == "liandange.com":
+            m_list = self.get_model_byid(mid, self.model_source)
+        else:
+            m_list = [e for e in self.model_set if e['id'] == mid]
+
+        if m_list is not None and len(m_list) > 0:
+            m = m_list[0]
+        else:
+            return {}, [[]], {}
+
+        if m and m.get('modelVersions') and len(m.get('modelVersions')) > 0:
+            for mv in m['modelVersions']:
+                if mv['name'] == version_name:
+                    cover_imgs = self.get_coverimg_by_mv(mv)
+                    self._ds_cover_gallery.samples = cover_imgs
+                    drop_list, download_url_by_default = self.get_files_by_mv(mv, m['type'] if m.get('type') else "unknown", cover_imgs)
+                    break
+
+        return (
+            gr.Dropdown.update(choices=drop_list, value=drop_list[0] if len(drop_list) > 0 else []),
+            cover_imgs,
+            gr.HTML.update(value=f'<p style="text-align: center;">'
+                     f'<a style="text-align: center;" href="{download_url_by_default}" '
+                     'target="_blank">Download</a></p>')
+                )
+
+    def get_model_info(self, models) -> t.Tuple[t.List[t.List[str]], t.Dict, t.Dict, str, t.Dict, t.Dict]:
+
+        version_list = []
         drop_list = []
         cover_imgs = []
+        sub_folder = []
         htmlDetail = "<div><p>No info found</p></div>"
 
         mid = models[1]
@@ -549,49 +669,17 @@ class MiaoshouRuntime(object):
         if m_list is not None and len(m_list) > 0:
             m = m_list[0]
         else:
-            return [[]], {}, htmlDetail, {}
+            return [[]], {}, {}, htmlDetail, {}, {}
 
         self.model_files.clear()
 
         download_url_by_default = None
         if m and m.get('modelVersions') and len(m.get('modelVersions')) > 0:
             latest_version = m['modelVersions'][0]
+            version_list = [mv['name'] for mv in m['modelVersions']]
 
-            if latest_version.get('images') and isinstance(latest_version.get('images'), list):
-                for img in latest_version['images']:
-                    if self.allow_nsfw or (not self.allow_nsfw and (not img.get('nsfw') or img.get('nsfw') in ['None', 'Soft'])):
-                        if img.get('url'):
-                            cover_imgs.append([f'<img referrerpolicy="no-referrer" src="{img["url"].replace("width=450","width=150").replace("/w/100", "/w/150")}" style="width:150px;">'])
-
-            if latest_version.get('files') and isinstance(latest_version.get('files'), list):
-                for file in latest_version['files']:
-                    # error checking for mandatory fields
-                    if file.get('id') is not None and file.get('downloadUrl') is not None:
-                        item_name = None
-                        if file.get('name'):
-                            item_name = file.get('name')
-                        if not item_name and latest_version.get('name'):
-                            item_name = latest_version['name']
-                        if not item_name:
-                            item_name = "unknown"
-
-                        self.model_files.append({
-                            "id:": file['id'],
-                            "url": file['downloadUrl'],
-                            "name": item_name,
-                            "type": m['type'] if m.get('type') else "unknown",
-                            "size": file['sizeKB'] * 1024 if file.get('sizeKB') else "unknown",
-                            "format": file['format'] if file.get('format') else "unknown",
-                            "cover": cover_imgs[0][0] if len(cover_imgs) > 0 else toolkit.get_not_found_image_url(),
-                        })
-                        file_size = toolkit.get_readable_size(file['sizeKB'] * 1024) if file.get('sizeKB') else ""
-                        if file_size:
-                            drop_list.append(f"{item_name} ({file_size})")
-                        else:
-                            drop_list.append(f"{item_name}")
-
-                        if not download_url_by_default:
-                            download_url_by_default = file.get('downloadUrl')
+            cover_imgs = self.get_coverimg_by_mv(latest_version)
+            drop_list, download_url_by_default = self.get_files_by_mv(latest_version, m['type'] if m.get('type') else "unknown", cover_imgs)
 
             htmlDetail = '<div>'
             if m.get('name'):
@@ -624,19 +712,29 @@ class MiaoshouRuntime(object):
             htmlDetail += "</tbody></table></div>"
             htmlDetail += f"<div>{m['description'] if m.get('description') else 'N/A'}</div>"
 
+            if m.get('type'):
+                stored_folder = self.prelude.model_type[m['type']]
+                for dirpath, dirnames, filenames in os.walk(stored_folder):
+                    if shared.models_path in dirpath:
+                        sub_folder.append("".join(dirpath.rsplit(shared.models_path + '\\')))
+                    elif shared.script_path in dirpath:
+                        sub_folder.append("".join(dirpath.rsplit(shared.script_path + '\\')))
+
         self._ds_cover_gallery.samples = cover_imgs
 
         return (
             cover_imgs,
+            gr.Dropdown.update(choices=version_list, value=version_list[0] if len(version_list) > 0 else []),
             gr.Dropdown.update(choices=drop_list, value=drop_list[0] if len(drop_list) > 0 else []),
             htmlDetail,
             gr.HTML.update(value=f'<p style="text-align: center;">'
                                  f'<a style="text-align: center;" href="{download_url_by_default}" '
-                                 'target="_blank">Download</a></p>')
+                                 'target="_blank">Download</a></p>'),
+            gr.Dropdown.update(choices=sub_folder, value=sub_folder[0] if len(sub_folder) > 0 else [])
         )
 
     def get_my_model_covers(self, model, model_type):
-        img_list, l1, htmlDetail, h2 = self.get_model_info(model)
+        img_list, v1, l1, htmlDetail, h2, l2 = self.get_model_info(model)
         if self._ds_my_model_covers is None:
             self.logger.error(f"_ds_my_model_covers is not initialized")
             return {}
@@ -738,7 +836,7 @@ class MiaoshouRuntime(object):
         (_, _, desc) = self.downloader_manager.tasks_summary()
         return gr.HTML.update(value=desc)
 
-    def download_model(self, filename: str):
+    def download_model(self, filename: str, des_folder: str):
         model_path = modules.paths.models_path
         script_path = modules.paths.script_path
 
@@ -754,7 +852,14 @@ class MiaoshouRuntime(object):
                 soup = BeautifulSoup(f['cover'])
                 cover_link = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450').replace('width=150', 'width=450')
 
-                if f['type'] == 'LORA':
+                if f['type'] != 'TextualInversion':
+                    cover_fname = os.path.join(model_path, des_folder, cover_fname)
+                    model_fname = os.path.join(model_path, des_folder, model_fname)
+                else:
+                    cover_fname = os.path.join(script_path, des_folder, cover_fname)
+                    model_fname = os.path.join(script_path, des_folder, model_fname)
+
+                '''if f['type'] == 'LORA':
                     cover_fname = os.path.join(model_path, 'Lora', cover_fname)
                     model_fname = os.path.join(model_path, 'Lora', model_fname)
                 elif f['type'].upper() == 'LoCon'.upper():
@@ -774,7 +879,7 @@ class MiaoshouRuntime(object):
                     model_fname = os.path.join(shared.script_path, 'extensions', 'sd-webui-controlnet', 'models', model_fname)
                 else:
                     cover_fname = os.path.join(model_path, 'Stable-diffusion', cover_fname)
-                    model_fname = os.path.join(model_path, 'Stable-diffusion', model_fname)
+                    model_fname = os.path.join(model_path, 'Stable-diffusion', model_fname)'''
 
                 urls.append((cover_link, f['url'], f['size'], cover_fname, model_fname))
                 break
@@ -1153,6 +1258,13 @@ class MiaoshouRuntime(object):
 
         return self._my_model_set
 
+    @property
+    def sorted_model_set(self) -> t.List[t.Dict]:
+        return self._sorted_model_set
+
+    @sorted_model_set.setter
+    def sorted_model_set(self, newone):
+        self._sorted_model_set = newone
 
     @property
     def allow_nsfw(self) -> bool:

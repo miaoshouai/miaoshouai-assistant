@@ -79,7 +79,9 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
                             'LORA': f'{os.path.join(shared.models_path,"Lora")}',
                             'LoCon': f'{os.path.join(shared.models_path, "LyCORIS")}',
                             "TextualInversion": f'{os.path.join(shared.script_path,"embeddings")}',
-                            "Hypernetwork": f'{os.path.join(shared.models_path,"hypernetworks")}'
+                            "Hypernetwork": f'{os.path.join(shared.models_path,"hypernetworks")}',
+                            "Controlnet": f'{os.path.join(shared.models_path, "ControlNet")}',
+                            "VAE": f'{os.path.join(shared.models_path, "VAE")}',
         }
 
         self._gpt_type = ['gpt-3.5-turbo', 'text-davinci-003']

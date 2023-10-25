@@ -302,6 +302,7 @@ class MiaoShouAssistant(object):
                     with widget.Row(equal_height=True):
                         nsfw_checker = gr.Checkbox(label='NSFW', value=False, elem_id="chk_nsfw", interactive=True)
                         with gr.Accordion(label="Base Model", open=False):
+                            rad_all_none = gr.Radio(label='', choices=['All', 'None'], default='All', value='All', interactive=True)
                             ckg_base_model = gr.CheckboxGroup(label='', choices=self.prelude.base_model_group,
                                                               default=self.prelude.base_model_group,
                                                               value=self.prelude.base_model_group,
@@ -310,6 +311,10 @@ class MiaoShouAssistant(object):
                         with gr.Accordion(label="Model Type", open=False):
                             model_type = gr.Radio(choices=["All"] + list(self.prelude.model_type.keys()),
                                               show_label=False, value='All', elem_id="rad_model_type",
+                                              interactive=True, elem_classes="full")
+                        with gr.Accordion(label="Sort", open=False):
+                            rad_sort = gr.Radio(choices=['Default', 'downloadCount', 'favoriteCount', 'commentCount', 'rating'],
+                                              show_label=False, value='Default', elem_id="rad_sort",
                                               interactive=True, elem_classes="full")
 
                     images = self.runtime.get_images_html(base_model=self.prelude.base_model_group)
@@ -345,9 +350,14 @@ class MiaoShouAssistant(object):
                             downloading_status = gr.Button(value=f"{self.refresh_symbol} Refresh Downloading Status",
                                                            elem_id="ms_dwn_status")
                     with gr.Row():
-                        model_dropdown = gr.Dropdown(choices=['Select Model'], label="Models", show_label=False,
-                                                     value='Select Model', elem_id='ms_dwn_button',
+                        model_version = gr.Dropdown(choices=['Select Version'], label="Version", show_label=False,
+                                                     value='Select Version', elem_id='dwn_vname',
                                                      interactive=True)
+                        model_dropdown = gr.Dropdown(choices=['Select Model'], label="Models", show_label=False,
+                                                     value='Select Model', elem_id='dwn_mname',
+                                                     interactive=True)
+                        model_des_folder = gr.Dropdown(choices=[], lable='Destination Folder', show_label=False,
+                                                       value='', elem_id='dwn_des_folder', interactive=True)
 
                         is_civitai_model_source_active = self.runtime.model_source == "civitai.com"
                         with gr.Row(variant="panel"):
@@ -361,6 +371,7 @@ class MiaoShouAssistant(object):
                     with gr.Row():
                         model_info = gr.HTML(visible=True)
 
+        rad_all_none.change(self.runtime.set_basemodel, inputs=[rad_all_none], outputs=[ckg_base_model])
         rad_model_tags.change(self.runtime.search_model, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags], outputs=self.runtime.ds_models)
         nsfw_checker.change(self.runtime.set_nsfw, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags],
                             outputs=self.runtime.ds_models)
@@ -368,23 +379,26 @@ class MiaoShouAssistant(object):
         model_type.change(self.runtime.search_model, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags], outputs=self.runtime.ds_models)
 
         #btn_fetch.click(self.runtime.refresh_all_models, inputs=[], outputs=self.runtime.ds_models)
-
-        btn_search.click(self.runtime.search_model, inputs=[search_text, nsfw_checker, ckg_base_model, model_type], outputs=self.runtime.ds_models)
+        rad_sort.change(self.runtime.sort_dataset, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags, rad_sort], outputs=self.runtime.ds_models)
+        btn_search.click(self.runtime.search_model, inputs=[search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags], outputs=self.runtime.ds_models)
 
         self.runtime.ds_models.click(self.runtime.get_model_info,
                                      inputs=[self.runtime.ds_models],
                                      outputs=[
                                          self.runtime.ds_cover_gallery,
+                                         model_version,
                                          model_dropdown,
                                          model_info,
-                                         open_url_in_browser_newtab_button
+                                         open_url_in_browser_newtab_button,
+                                         model_des_folder
                                      ])
 
-        dwn_button.click(self.runtime.download_model, inputs=[model_dropdown], outputs=[download_summary])
+        model_version.change(self.runtime.select_version, inputs=[self.runtime.ds_models, model_version], outputs=[model_dropdown, self.runtime.ds_cover_gallery, open_url_in_browser_newtab_button])
+        dwn_button.click(self.runtime.download_model, inputs=[model_dropdown, model_des_folder], outputs=[download_summary])
         downloading_status.click(self.runtime.get_downloading_status, inputs=[], outputs=[download_summary])
 
         model_source_dropdown.change(self.switch_model_source,
-                                     inputs=[model_source_dropdown],
+                                     inputs=[model_source_dropdown, search_text, nsfw_checker, ckg_base_model, model_type, rad_model_tags, rad_sort],
                                      outputs=[self.runtime.ds_models, dwn_button, open_url_in_browser_newtab_button])
 
         def tab_downloads_select():
@@ -452,11 +466,31 @@ class MiaoShouAssistant(object):
         #launch.start()
         return gr.Markdown.update(value="Settings Saved", visible=True)
 
-    def switch_model_source(self, new_model_source: str):
+    def switch_model_source(self, new_model_source: str, search, chk_nsfw, base_model, model_type, model_tag, sort_by):
+        def sort_key(item, key):
+            if key in item['stats']:
+                return item['stats'][key]
+
+        print(sort_by)
         self.runtime.model_source = new_model_source
         show_download_button = self.runtime.model_source != "liandange.com"
-        images = self.runtime.get_images_html()
+
+        if sort_by != 'Default':
+            self.runtime.sorted_model_set = sorted(self.runtime.model_set, key=lambda item: sort_key(item, sort_by), reverse=True)
+        else:
+            self.runtime.sorted_model_set = self.runtime.model_set
+
+        if self.runtime.ds_models:
+            self.runtime.ds_models.samples = self.runtime.sorted_model_set
+            self.runtime.ds_models.update(samples=self.runtime.sorted_model_set)
+        else:
+            self.logger.error(f"ds models is null")
+
+        images = self.runtime.get_images_html(search, chk_nsfw, base_model, model_type, model_tag)
+        #images = self.runtime.sort_dataset(search, chk_nsfw, base_model, model_type, model_tag)
+        print(images[0])
         self.runtime.ds_models.samples = images
+        self.runtime.ds_models.update(samples=self.runtime.sorted_model_set)
 
         if self.runtime.model_source not in ['official_models', 'hugging_face', 'controlnet']:
             self.runtime.update_boot_setting('model_source', self.runtime.model_source)
