@@ -1,0 +1,3 @@
+[submodule "assets"]
+	path = assets
+	url = https://e.coding.net/miaoshouai/miaoshou-stable-diffusion-webui/assets.git
