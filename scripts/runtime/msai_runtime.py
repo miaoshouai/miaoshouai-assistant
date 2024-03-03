@@ -23,8 +23,9 @@ import time
 import torch
 import typing as t
 from bs4 import BeautifulSoup
+from PIL import Image
 from gpt_index import SimpleDirectoryReader, GPTListIndex, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
-from modules import shared, sd_hijack, sd_samplers, processing
+from modules import shared, sd_hijack, sd_samplers, processing, images
 from modules.sd_models import CheckpointInfo
 from numba import cuda
 
@@ -796,21 +797,6 @@ class MiaoshouRuntime(object):
         for mv in m['modelVersions']:
             for img in mv['images']:
                 if img['url'] == cover_url:
-                    if img['meta'] is not None and img['meta'] != '':
-                        try:
-                            meta = img['meta']
-                            generation_info += f"{meta['prompt']}\n"
-                            if meta['negativePrompt'] is not None:
-                                generation_info += f"Negative prompt: {meta['negativePrompt']}\n"
-                            generation_info += f"Steps: {meta['steps']}, Sampler: {meta['sampler']}, "
-                            generation_info += f"CFG scale: {meta['cfgScale']}, Seed: {meta['seed']}, Size: {meta['Size']},"
-                            if meta['Model hash'] is not None:
-                                generation_info += f"Model hash: {meta['Model hash']}"
-
-                        except Exception as e:
-                            self.logger.info(f"generation_info error:{str(e)}")
-                            pass
-
                     if not os.path.exists(self.prelude.cache_folder):
                         os.mkdir(self.prelude.cache_folder)
 
@@ -819,15 +805,19 @@ class MiaoshouRuntime(object):
                     elif self.my_model_source == 'liandange.com':
                         fname = os.path.join(self.prelude.cache_folder, cover_url.split('?')[0].split('/')[-1])
 
-                    break
+                    if fname is not None and not os.path.exists(fname):
+                        if self.my_model_source == 'liandange.com':
+                            cover_url = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450')
+                        r = requests.get(cover_url, timeout=30, stream=True)
+                        r.raw.decode_content = True
+                        with open(fname, 'wb') as f:
+                            shutil.copyfileobj(r.raw, f)
 
-        if fname is not None and not os.path.exists(fname):
-            if self.my_model_source == 'liandange.com':
-                cover_url = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450')
-            r = requests.get(cover_url, timeout=30, stream=True)
-            r.raw.decode_content = True
-            with open(fname, 'wb') as f:
-                shutil.copyfileobj(r.raw, f)
+                    if os.path.exists(fname):
+                        c_image = Image.open(fname)
+                        html, generation_info, html2 = modules.extras.run_pnginfo(c_image)
+
+                    break
 
         return gr.Button.update(visible=True), gr.Text.update(value=generation_info), gr.Image.update(value=fname)
 

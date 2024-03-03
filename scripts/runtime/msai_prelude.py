@@ -35,7 +35,7 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
     def _init_constants(self) -> None:
         self._api_url = {
             "civitai.com": "https://model-share.com/v1/models",
-            "liandange.com": "https://model-api.liandange.com/model/api/models",
+            "liandange.com": "http://api.miaoshouai.com/model/api/models",
         }
         self._ext_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
         self._setting_file = os.path.join(self.ext_folder, "configs", "settings.json")

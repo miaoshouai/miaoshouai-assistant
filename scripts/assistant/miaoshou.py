@@ -203,7 +203,7 @@ class MiaoShouAssistant(object):
                         with gr.Column():
 
                             btn_load_model = gr.HTML(
-                                value=f'<div class="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;"' \
+                                value=f'<div class="lg secondary gradio-button svelte-cmf5ev" style="text-align: center;"' \
                                         f'onclick="return selectCheckpoint()">Load Model</div>',
                                 visible=True)
                         with gr.Column():
@@ -364,7 +364,7 @@ class MiaoShouAssistant(object):
                             dwn_button = gr.Button(value='Download',
                                                    visible=is_civitai_model_source_active, elem_id='ms_dwn_button')
                             open_url_in_browser_newtab_button = gr.HTML(
-                                value='<div class="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;">'
+                                value='<div class="lg secondary gradio-button svelte-cmf5ev" style="text-align: center;">'
                                       '<a style="text-align: center;" href="http://www.liandange.com/models" '
                                       'target="_blank">Download</a></div>',
                                 visible=not is_civitai_model_source_active)
