@@ -755,21 +755,21 @@ class MiaoshouRuntime(object):
 
         if model_type == 'TextualInversion':
             mname, ext = os.path.splitext(model[3][0])
-            button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
+            button_html = '<div class ="lg secondary gradio-button svelte-cmf5ev" style="text-align: center;" ' \
                             f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;{mname}&quot;, true)"><a href="javascript:void(0)">Send to Prompt</a></div>'
 
         elif model_type == 'LORA':
             mname, ext = os.path.splitext(model[3][0])
-            button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
+            button_html = '<div class ="lg secondary gradio-button svelte-cmf5ev" style="text-align: center;" ' \
                           f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;<lora:{mname}:&quot; + opts.extra_networks_default_multiplier + &quot;>&quot;, false)"><a href="javascript:void(0)">Send to Prompt</a></div>'
         elif model_type.upper() == 'LoCon'.upper():
             mname, ext = os.path.splitext(model[3][0])
-            button_html = '<div class ="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;" ' \
+            button_html = '<div class ="lg secondary gradio-button svelte-cmf5ev" style="text-align: center;" ' \
                           f'onclick="return cardClicked(&quot;txt2img&quot;, &quot;<lyco:{mname}:&quot; + opts.extra_networks_default_multiplier + &quot;>&quot;, false)"><a href="javascript:void(0)">Send to Prompt</a></div>'
         else:
             mpath = os.path.join(self.prelude.model_type[model_type], model[3][0])
             checkpoint_info = CheckpointInfo(mpath)
-            button_html = f'<div class="lg secondary gradio-button svelte-1ipelgc" style="text-align: center;"' \
+            button_html = f'<div class="lg secondary gradio-button svelte-cmf5ev" style="text-align: center;"' \
                           f'onclick="return selectCheckpoint(&quot;{checkpoint_info.title}&quot;)"><a href="javascript:void(0)">Load Model</a></div>'
 
         self._ds_my_model_covers.samples = cover_list
