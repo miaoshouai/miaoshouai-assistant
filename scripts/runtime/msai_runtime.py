@@ -590,11 +590,11 @@ class MiaoshouRuntime(object):
         download_url_by_default = None
 
         self.model_files.clear()
-        print(cur_version.get('files'))
+        #print(cur_version.get('files'))
         if cur_version.get('files') and isinstance(cur_version.get('files'), list):
             for file in cur_version['files']:
                 # error checking for mandatory fields
-                print(file.get('id'), file.get('downloadUrl'))
+                #print(file.get('id'), file.get('downloadUrl'))
                 if file.get('id') is not None and file.get('downloadUrl') is not None:
                     item_name = None
                     if file.get('name'):
@@ -619,7 +619,7 @@ class MiaoshouRuntime(object):
                     else:
                         drop_list.append(f"{item_name}")
 
-                    print(file)
+                    #print(file)
                     if not download_url_by_default:
                         download_url_by_default = file.get('downloadUrl')
 
