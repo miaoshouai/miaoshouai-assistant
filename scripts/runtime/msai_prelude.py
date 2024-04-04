@@ -35,7 +35,7 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
     def _init_constants(self) -> None:
         self._api_url = {
             "civitai.com": "https://model-share.com/v1/models",
-            "liandange.com": "http://api.miaoshouai.com/model/api/models",
+            "miaoshouai.com": "http://api.miaoshouai.com/model/api/models",
         }
         self._ext_folder = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
         self._setting_file = os.path.join(self.ext_folder, "configs", "settings.json")
@@ -47,7 +47,7 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
         self._no_preview_img = os.path.join(modules.paths.script_path, "html", "card-no-preview.png")
         self._model_json = {
             'civitai.com': os.path.join(self.ext_folder, 'configs', 'civitai_models.json'),
-            'liandange.com': os.path.join(self.ext_folder, 'configs', 'liandange_models.json'),
+            'miaoshouai.com': os.path.join(self.ext_folder, 'configs', 'liandange_models.json'),
             'official_models': os.path.join(self.ext_folder, 'configs', 'official_models.json'),
             'hugging_face': os.path.join(self.ext_folder, 'configs', 'hugging_face.json'),
             'controlnet': os.path.join(self.ext_folder, 'configs', 'controlnet.json')

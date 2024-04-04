@@ -1185,6 +1185,63 @@
                         },
                         "downloadUrl": "https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/t2i-adapter_diffusers_xl_sketch.safetensors",
                         "primary": false
+                    },
+                    {
+                        "name": "OpenPoseXL2.safetensors",
+                        "id": 323,
+                        "sizeKB": 5458126.130859375,
+                        "type": "Model",
+                        "format": "safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "5A4B928CB1",
+                            "SHA256": "5A4B928CB1E93748217900CB66D4135BF70D932D2924232F925910FAD9E43A92",
+                            "CRC32": "5A4B928CB1",
+                            "BLAKE3": "5A4B928CB1E93748217900CB66D4135BF70D932D2924232F925910FAD9E43A92"
+                        },
+                        "downloadUrl": "https://huggingface.co/thibaud/controlnet-openpose-sdxl-1.0/resolve/main/OpenPoseXL2.safetensors?download=true",
+                        "primary": false
+                    },
+                    {
+                        "name": "TTPLANET_Controlnet_Tile_realistic_v1_fp16.safetensors",
+                        "id": 325,
+                        "sizeKB": 2858126.130859375,
+                        "type": "Model",
+                        "format": "safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "FA2A5F2FEC",
+                            "SHA256": "FA2A5F2FEC814819C835403C778BE2C2437D147931921304569FCCEC2B45173C",
+                            "CRC32": "FA2A5F2FEC",
+                            "BLAKE3": "FA2A5F2FEC814819C835403C778BE2C2437D147931921304569FCCEC2B45173C"
+                        },
+                        "downloadUrl": "https://huggingface.co/TTPlanet/TTPLanet_SDXL_Controlnet_Tile_Realistic_V1/resolve/main/TTPLANET_Controlnet_Tile_realistic_v1_fp16.safetensors?download=true",
+                        "primary": false
+                    },
+                    {
+                        "name": "controlnet-temporalnet-sdxl-1.0.safetensors",
+                        "id": 325,
+                        "sizeKB": 5458126.130859375,
+                        "type": "Model",
+                        "format": "safetensors",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "5EBD74469F",
+                            "SHA256": "5EBD74469FCE5F89F95E6F2973E55C6A4EC1C1B35C0A9BA362AD669A99F81244",
+                            "CRC32": "5EBD74469F",
+                            "BLAKE3": "5EBD74469FCE5F89F95E6F2973E55C6A4EC1C1B35C0A9BA362AD669A99F81244"
+                        },
+                        "downloadUrl": "https://huggingface.co/CiaraRowles/controlnet-temporalnet-sdxl-1.0/resolve/main/diffusion_pytorch_model.safetensors?download=true",
+                        "primary": false
                     }
                 ],
                 "images": [

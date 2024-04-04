@@ -31,7 +31,7 @@
             {
                 "id": 1,
                 "modelId": 7019,
-                "name": "Zdzislaw Beksinski LORA",
+                "name": "v1-5-pruned-emaonly",
                 "createdAt": "2023-02-06T13:52:34.605Z",
                 "updatedAt": "2023-02-06T13:52:34.605Z",
                 "trainedWords": [],
@@ -581,6 +581,69 @@
                         },
                         "downloadUrl": "https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors",
                         "primary": true
+                    }
+                ],
+                "images": [
+                    {
+                        "url": "https://msdn.miaoshouai.com/msai/kt/ez/9900922.png"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Stable Video Diffusion",
+        "description": "<p>Stable Video Diffusion (SVD) 1.1 Image-to-Video is a diffusion model that takes in a still image as a conditioning frame, and generates a video from it.",
+        "type": "Model",
+        "poi": false,
+        "nsfw": false,
+        "allowNoCredit": true,
+        "allowCommercialUse": "Rent",
+        "allowDerivatives": true,
+        "allowDifferentLicense": true,
+        "stats": {
+            "downloadCount": 865,
+            "favoriteCount": 190,
+            "commentCount": 7,
+            "ratingCount": 2,
+            "rating": 5
+        },
+        "creator": {
+            "username": "stabilityai",
+            "image": "https://huggingface.co/runwayml/stable-diffusion-v1-5"
+        },
+        "tags": [],
+        "modelVersions": [
+            {
+                "id": 401,
+                "modelId": 401,
+                "name": "Model",
+                "createdAt": "2023-02-06T13:52:34.605Z",
+                "updatedAt": "2023-02-06T13:52:34.605Z",
+                "trainedWords": [],
+                "baseModel": "SVD",
+                "earlyAccessTimeFrame": 0,
+                "description": "<p></p>",
+                "files": [
+                    {
+                        "name": "svd_xt_1_1.safetensors",
+                        "id": 40101,
+                        "sizeKB": 40447126.130859375,
+                        "type": "Model",
+                        "format": "CKPT",
+                        "pickleScanResult": "Success",
+                        "pickleScanMessage": "No Pickle imports",
+                        "virusScanResult": "Success",
+                        "scannedAt": "2023-02-06T13:55:58.281Z",
+                        "hashes": {
+                            "AutoV2": "69CCFEA1BB",
+                            "SHA256": "69CCFEA1BB45DD63B3BA8B6CFE8B0D45D780995DFDDE590AEAA97CC567018D33",
+                            "CRC32": "69CCFEA1BB",
+                            "BLAKE3": "69CCFEA1BB45DD63B3BA8B6CFE8B0D45D780995DFDDE590AEAA97CC567018D33"
+                        },
+                        "downloadUrl": "https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt-1-1/commit/e2fe0c40fbc1f3dda1c262b4c7d5487cda6414c9",
+                        "primary": false
                     }
                 ],
                 "images": [

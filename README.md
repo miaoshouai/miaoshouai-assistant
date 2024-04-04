@@ -4,6 +4,7 @@
 
 MiaoshouAI Assistant for [Automatic1111 WebUI](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
 
+1.81 Added MiaoshouAI as a model download source for people who can't access civitai; added a few sdxl controlnet and official downloads.
 1.80 Fixed download problem in webui 1.60; Added support for model sorting; Model version, sub-folder support for download; Other bug fixes and improvements</br>
 1.70 Improved search capability for Civitai to include keyword search in model names; Now supports SDXL model search (Data source update and full of restart webui update required) and filter model by tags. Fixed model loading error.</br>
 1.60 Add VRAM garbage collection for image generation so that VRAM is freed up after every run; if your run into out of memory, just go to Boot Assistant and click "VRAM Release" to free up the memory.</br>
@@ -50,7 +51,7 @@ You can easily send these civitai prompts to txt2img/img2img/inpainting/extra
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/model_downloader.gif"/>
 </p>
 
-- Allows you to search and download models from civitai.com or liandange.com, find the model type you want
+- Allows you to search and download models from civitai.com or miaoshouai.com, find the model type you want
 
 <p align="center">
    <img src="https://msdn.miaoshouai.com/msai/kt/ez/controlnet_download.gif"/>

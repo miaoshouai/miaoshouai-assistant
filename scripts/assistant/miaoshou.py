@@ -162,9 +162,11 @@ class MiaoShouAssistant(object):
                         btn_my_search = gr.Button("Search")
 
                     with gr.Row():
+                        ms, my_model_source = self.runtime.get_default_model_source()
+                        print(my_model_source)
                         my_model_source_dropdown = widget.Dropdown(
-                            choices=["civitai.com", "liandange.com"],
-                            value=self.runtime.my_model_source,
+                            choices=["civitai.com", "miaoshouai.com"],
+                            value=my_model_source,
                             label="Select Model Source",
                             type="value",
                             show_label=True,
@@ -275,8 +277,9 @@ class MiaoShouAssistant(object):
             with gr.Row():
                 with gr.Column(elem_id="col_model_list"):
                     with widget.Row(equal_height=True):
-                        model_source_dropdown = widget.Dropdown(choices=["civitai.com", "liandange.com", "official_models", 'hugging_face', "controlnet"],
-                                                            value=self.runtime.model_source,
+                        model_source, mms = self.runtime.get_default_model_source()
+                        model_source_dropdown = widget.Dropdown(choices=["civitai.com", "miaoshouai.com", "official_models", 'hugging_face', "controlnet"],
+                                                            value=model_source,
                                                             label="Select Model Source",
                                                             type="value",
                                                             show_label=True,
@@ -365,7 +368,7 @@ class MiaoShouAssistant(object):
                                                    visible=is_civitai_model_source_active, elem_id='ms_dwn_button')
                             open_url_in_browser_newtab_button = gr.HTML(
                                 value='<div class="lg secondary gradio-button svelte-cmf5ev" style="text-align: center;">'
-                                      '<a style="text-align: center;" href="http://www.liandange.com/models" '
+                                      '<a style="text-align: center;" href="http://www.miaoshouai.com/models" '
                                       'target="_blank">Download</a></div>',
                                 visible=not is_civitai_model_source_active)
                     with gr.Row():
@@ -472,14 +475,13 @@ class MiaoShouAssistant(object):
                 return item['stats'][key]
 
         self.runtime.model_source = new_model_source
-        show_download_button = self.runtime.model_source != "liandange.com"
+        show_download_button = self.runtime.model_source != "miaoshouai.com"
 
         if sort_by != 'Default':
             self.runtime.sorted_model_set = sorted(self.runtime.model_set, key=lambda item: sort_key(item, sort_by), reverse=True)
         else:
             self.runtime.sorted_model_set = self.runtime.model_set
 
-        print(len(self.runtime.sorted_model_set))
         if self.runtime.ds_models:
             self.runtime.ds_models.samples = self.runtime.sorted_model_set
             self.runtime.ds_models.update(samples=self.runtime.sorted_model_set)

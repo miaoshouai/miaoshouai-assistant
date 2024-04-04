@@ -102,6 +102,13 @@ class MiaoshouRuntime(object):
 
         return gpu, theme, port, checkbox_values, additional_args.replace('\\', '\\\\').strip(), webui_ver
 
+    def get_default_model_source(self):
+        saved_setting = self.prelude.boot_settings
+        ms = saved_setting.get('model_source')
+        mms = saved_setting.get('my_model_source')
+
+        return ms, mms
+
     def add_arg(self, args: str = "") -> None:
         for arg in args.split('--'):
             if f"--{arg.strip()}" not in self.cmdline_args and arg.strip() != '':
@@ -407,7 +414,7 @@ class MiaoshouRuntime(object):
                     dst = os.path.join(mfolder, f'{mname}.jpg')
 
                     if fname is not None and not os.path.exists(dst):
-                        if self.my_model_source == 'liandange.com':
+                        if self.my_model_source == 'miaoshouai.com':
                             cover_url = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450')
                         r = requests.get(cover_url, timeout=30, stream=True)
                         r.raw.decode_content = True
@@ -561,6 +568,10 @@ class MiaoshouRuntime(object):
         if payload.get("success") is not None and not payload.get("success"):
             return []
 
+        if model_source == 'miaoshouai.com':
+            if len(payload['items']) <= 0:
+                return []
+            payload = payload['items'][0]
         return [payload]
 
     def get_coverimg_by_mv(self, cur_version):
@@ -579,9 +590,11 @@ class MiaoshouRuntime(object):
         download_url_by_default = None
 
         self.model_files.clear()
+        print(cur_version.get('files'))
         if cur_version.get('files') and isinstance(cur_version.get('files'), list):
             for file in cur_version['files']:
                 # error checking for mandatory fields
+                print(file.get('id'), file.get('downloadUrl'))
                 if file.get('id') is not None and file.get('downloadUrl') is not None:
                     item_name = None
                     if file.get('name'):
@@ -606,6 +619,7 @@ class MiaoshouRuntime(object):
                     else:
                         drop_list.append(f"{item_name}")
 
+                    print(file)
                     if not download_url_by_default:
                         download_url_by_default = file.get('downloadUrl')
 
@@ -617,7 +631,7 @@ class MiaoshouRuntime(object):
         drop_list = []
         download_url_by_default = None
 
-        if self.model_source == "civitai.com" or self.model_source == "liandange.com":
+        if self.model_source == "civitai.com" or self.model_source == "miaoshouai.com":
             m_list = self.get_model_byid(mid, self.model_source)
         else:
             m_list = [e for e in self.model_set if e['id'] == mid]
@@ -655,12 +669,12 @@ class MiaoshouRuntime(object):
 
         # TODO: use map to enhance the performances
         if self.active_model_set == 'model_set':
-            if self.model_source == "civitai.com" or self.model_source == "liandange.com":
+            if self.model_source == "civitai.com" or self.model_source == "miaoshouai.com":
                 m_list = self.get_model_byid(mid, self.model_source)
             else:
                 m_list = [e for e in self.model_set if e['id'] == mid]
         else:
-            if self.my_model_source == "civitai.com" or self.my_model_source == "liandange.com":
+            if self.my_model_source == "civitai.com" or self.my_model_source == "miaoshouai.com":
                 m_list = self.get_model_byid(mid, self.my_model_source)
                 self._allow_nsfw = True
             else:
@@ -727,9 +741,8 @@ class MiaoshouRuntime(object):
             gr.Dropdown.update(choices=version_list, value=version_list[0] if len(version_list) > 0 else []),
             gr.Dropdown.update(choices=drop_list, value=drop_list[0] if len(drop_list) > 0 else []),
             htmlDetail,
-            gr.HTML.update(value=f'<p style="text-align: center;">'
-                                 f'<a style="text-align: center;" href="{download_url_by_default}" '
-                                 'target="_blank">Download</a></p>'),
+
+            gr.HTML.update(value=f'<div class="lg secondary gradio-button svelte-cmf5ev" style="text-align: center;"><a style="text-align: center;" href="{download_url_by_default}" target="_blank">Download</a></div>'),
             gr.Dropdown.update(choices=sub_folder, value=sub_folder[0] if len(sub_folder) > 0 else [])
         )
 
@@ -800,24 +813,36 @@ class MiaoshouRuntime(object):
                     if not os.path.exists(self.prelude.cache_folder):
                         os.mkdir(self.prelude.cache_folder)
 
+                    # update to fix civitai removing meta data from api bug
                     if self.my_model_source == 'civitai.com':
                         fname = os.path.join(self.prelude.cache_folder, f"{cover_url.split('/')[-1]}.jpg")
-                    elif self.my_model_source == 'liandange.com':
+                        if fname is not None and not os.path.exists(fname):
+                            r = requests.get(cover_url, timeout=30, stream=True)
+                            r.raw.decode_content = True
+                            with open(fname, 'wb') as f:
+                                shutil.copyfileobj(r.raw, f)
+
+                        if os.path.exists(fname):
+                            c_image = Image.open(fname)
+                            html, generation_info, html2 = modules.extras.run_pnginfo(c_image)
+                        break
+                    elif self.my_model_source == 'miaoshouai.com':
                         fname = os.path.join(self.prelude.cache_folder, cover_url.split('?')[0].split('/')[-1])
-
-                    if fname is not None and not os.path.exists(fname):
-                        if self.my_model_source == 'liandange.com':
-                            cover_url = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450')
-                        r = requests.get(cover_url, timeout=30, stream=True)
-                        r.raw.decode_content = True
-                        with open(fname, 'wb') as f:
-                            shutil.copyfileobj(r.raw, f)
-
-                    if os.path.exists(fname):
-                        c_image = Image.open(fname)
-                        html, generation_info, html2 = modules.extras.run_pnginfo(c_image)
-
-                    break
+                        cover_url = soup.findAll('img')[0]['src'].replace('/w/150', '/w/450')
+                        if img['meta'] is not None and img['meta'] != '':
+                            try:
+                                meta = img['meta']
+                                generation_info += f"{meta['prompt']}\n"
+                                if meta['negativePrompt'] is not None:
+                                    generation_info += f"Negative prompt: {meta['negativePrompt']}\n"
+                                generation_info += f"Steps: {meta['steps']}, Sampler: {meta['sampler']}, "
+                                generation_info += f"CFG scale: {meta['cfgScale']}, Seed: {meta['seed']}, Size: {meta['Size']},"
+                                if meta['Model hash'] is not None:
+                                    generation_info += f"Model hash: {meta['Model hash']}"
+                                break
+                            except Exception as e:
+                                self.logger.info(f"generation_info error:{str(e)}")
+                                pass
 
         return gr.Button.update(visible=True), gr.Text.update(value=generation_info), gr.Image.update(value=fname)
 
