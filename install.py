@@ -39,3 +39,4 @@ with open(req_file) as file:
             launch.run_pip(f"install {lib}", f"Miaoshou assistant requirement: {lib}")
 
 install_preset_models_if_needed()
+
