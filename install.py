@@ -2,9 +2,8 @@ import launch
 import os
 import gzip
 import io
+import git
 import shutil
-import subprocess
-import sys
 
 def install_preset_models_if_needed():
     assets_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets")
@@ -21,21 +20,14 @@ def install_preset_models_if_needed():
                         with open(target_file, "w") as model_file:
                             model_file.write(content)
         except Exception as e:
-            print(f"Failed to find or extract {model_filename} under assets directory: {e}")
+            print(f"failed to find out {model_filename} under assets directory: {e}")
 
 req_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "requirements.txt")
-
-def is_installed(lib):
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "show", lib.split('==')[0]], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return True
-    except subprocess.CalledProcessError:
-        return False
 
 with open(req_file) as file:
     for lib in file:
         lib = lib.strip()
-        if lib and not is_installed(lib):
+        if not launch.is_installed(lib):
             launch.run_pip(f"install {lib}", f"Miaoshou assistant requirement: {lib}")
 
 install_preset_models_if_needed()
