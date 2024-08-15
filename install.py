@@ -17,7 +17,7 @@ def install_preset_models_if_needed():
                 with gzip.open(gzip_file, "rb") as compressed_file:
                     with io.TextIOWrapper(compressed_file, encoding="utf-8") as decoder:
                         content = decoder.read()
-                        with open(target_file, "w") as model_file:
+                        with open(target_file, "w", encoding="utf-8") as model_file:
                             model_file.write(content)
         except Exception as e:
             print(f"failed to find out {model_filename} under assets directory: {e}")

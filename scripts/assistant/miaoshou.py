@@ -163,7 +163,6 @@ class MiaoShouAssistant(object):
 
                     with gr.Row():
                         ms, my_model_source = self.runtime.get_default_model_source()
-                        print(my_model_source)
                         my_model_source_dropdown = widget.Dropdown(
                             choices=["civitai.com", "miaoshouai.com"],
                             value=my_model_source,
@@ -303,7 +302,6 @@ class MiaoShouAssistant(object):
                                                 interactive=True, elem_classes="full")
 
                     with widget.Row(equal_height=True):
-                        nsfw_checker = gr.Checkbox(label='NSFW', value=False, elem_id="chk_nsfw", interactive=True)
                         with gr.Accordion(label="Base Model", open=False):
                             rad_all_none = gr.Radio(label='', choices=['All', 'None'], default='All', value='All', interactive=True)
                             ckg_base_model = gr.CheckboxGroup(label='', choices=self.prelude.base_model_group,
@@ -311,6 +309,9 @@ class MiaoShouAssistant(object):
                                                               value=self.prelude.base_model_group,
                                                               elem_id="ckg_base_model", interactive=True)
                             btn_bm_apply = gr.Button(value="Apply fiter")
+
+                    with widget.Row(equal_height=True):
+                        nsfw_checker = gr.Checkbox(label='NSFW', value=False, elem_id="chk_nsfw", interactive=True)
                         with gr.Accordion(label="Model Type", open=False):
                             model_type = gr.Radio(choices=["All"] + list(self.prelude.model_type.keys()),
                                               show_label=False, value='All', elem_id="rad_model_type",
@@ -420,7 +421,15 @@ class MiaoShouAssistant(object):
                     display_text = self.prelude.boot_settings['openai_api']
                 txt_gptapi = gr.Textbox(label='OpenAI API Key', value=display_text)
             with gr.Row():
-                btn_update_gptapi = gr.Button(value="Update API Key")
+                btn_update_gptapi = gr.Button(value="Update API Key")            
+            with gr.Row():
+                if self.prelude.boot_settings['civitai_api'] == '':
+                    display_text = 'Enter you Civitai API Key here, you can get it from https://civitai.com/user/account'
+                else:
+                    display_text = self.prelude.boot_settings['civitai_api']
+                txt_civitai_api = gr.Textbox(label='Civitai API Key', value=display_text)
+            with gr.Row():
+                btn_civitai_api= gr.Button(value="Save Civitai API Key")
             with gr.Row():
                 txt_update_result = gr.Markdown(visible=False)
             with gr.Row():
@@ -449,6 +458,8 @@ class MiaoShouAssistant(object):
 
             btn_check_update.click(self.runtime.check_update, inputs=[], outputs=[txt_update_result, chk_dont_update_ms, btn_update])
             btn_update_gptapi.click(self.runtime.update_gptapi, inputs=[txt_gptapi], outputs=[md_api_res, self.txt_main_prompt])
+            btn_civitai_api.click(self.runtime.update_civitai_api, inputs=[txt_civitai_api],
+                                    outputs=[md_api_res, txt_civitai_api])
             btn_update.click(self.runtime.update_program, inputs=[chk_dont_update_ms], outputs=[txt_update_result])
 
     def save_cmdline_args(self, drp_gpu, drp_theme, txt_listen_port, chk_group_args, additional_args):

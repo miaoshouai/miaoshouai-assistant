@@ -13,8 +13,9 @@
         "txt_args_more": "",
         "auto_vram": true,
         "disable_log_console_output": true,
-        "model_source": "liandange.com",
+        "model_source": "miaoshouai.com",
         "my_model_source": "civitai.com",
-        "openai_api": ""
+        "openai_api": "",
+        "civitai_api": ""
     }
 }

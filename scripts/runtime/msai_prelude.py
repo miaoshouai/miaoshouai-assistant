@@ -84,9 +84,9 @@ class MiaoshouPrelude(metaclass=MiaoshouSingleton):
                             "VAE": f'{os.path.join(shared.models_path, "VAE")}',
         }
 
-        self._gpt_type = ['gpt-3.5-turbo', 'text-davinci-003']
-        self._model_tags = ['Character', 'Style', 'Anime', 'Photorealistic', 'Concept', 'Clothing', 'Base Model', 'Poses', 'Background', 'Tool', 'Buildings']
-        self._base_model_group = ['SD 1.4', 'SD 1.5', 'SD 2.0', 'SD 2.0 768', 'SD 2.1', 'SD 2.1 768', 'SD 2.1 Unclip', 'SDXL 0.9', 'SDXL 1.0', 'Other']
+        self._gpt_type = ['gpt-3.5-turbo', 'gpt-4o-mini']
+        self._model_tags = ['Character', 'Style', 'Anime', 'Celebrity', 'Photorealistic', 'Concept', 'Clothing', 'Base Model', 'Poses', 'Background', 'Tool', 'Buildings', 'Vehicle', 'Objects', 'Animal', 'Action']
+        self._base_model_group = ['SD 1.4', 'SD 1.5', 'SD 1.5 LCM', 'SD 1.5 Hyper', 'SD 2.0', 'SD 2.0 768', 'SD 2.1', 'Stable Cascade', 'SDXL 1.0', 'SDXL 1.0 LCM', 'SDXL Turbo', 'SDXL Lightning', 'SDXL Hyper', 'Pony', 'SD 3', 'Playground v2', 'Aura Flow', 'PixArt a', 'PixArt E', 'Hunyuan 1', 'Lumina', 'Kolors', 'Flux.1 D', 'Other']
 
     @property
     def ext_folder(self) -> str:
